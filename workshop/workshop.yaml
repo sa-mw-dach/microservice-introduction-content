@@ -1,5 +1,5 @@
 ---
-name: Bookbag Demo
+name: Red Hat OpenTour 2022 DACH
 modules:
   activate:
     - overview

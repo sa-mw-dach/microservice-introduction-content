@@ -1,4 +1,4 @@
-= Bookbag Demo
+= Red Hat OpenTour 2022 DACH
 
 xref:overview.adoc[Overview]
 
