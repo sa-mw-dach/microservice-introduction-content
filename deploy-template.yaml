@@ -17,7 +17,7 @@ parameters:
     value: bookbag-demo
   - name: IMAGE_STREAM_NAME
     required: true
-    value: bookbag-demo
+    value: bookbag-opentour-2022-dach
   - name: IMAGE_STREAM_NAMESPACE
   - name: IMAGE
     value: set-by-trigger
@@ -30,7 +30,7 @@ parameters:
   - name: AUTH_PASSWORD
     value: ''
   - name: CONSOLE_IMAGE
-    value: quay.io/openshift/origin-console:4.5
+    value: quay.io/openshift/origin-console:4.10
     required: true
   - name: CONSOLE_BRANDING
     value: openshift

@@ -13,12 +13,12 @@ metadata:
 parameters:
   - name: NAME
     required: true
-    value: bookbag-demo
+    value: bookbag-opentour-2022-dach
   - name: BUILDER_IMAGE
     required: true
     value: quay.io/openshifthomeroom/workshop-dashboard:5.0.0
   - name: GIT_REPO
-    value: https://github.com/redhat-gpte-labs/bookbag-demo.git
+    value: https://github.com/rbo/bookbag-opentour-2022-dach.git
 
 objects:
   - apiVersion: image.openshift.io/v1
