@@ -1,4 +1,10 @@
+:guid: %guid%
+:ssh_command: %ssh_command%
+:ssh_password: %ssh_password%
+:ssh_username: %ssh_username%
+:targethost_fqdn: %targethost%
 :markup-in-source: verbatim,attributes,quotes
+:show_solution: true
 
 == OpenShift Access
 
@@ -76,3 +82,31 @@ There is a symbolic link provided that links `deploy-template.yaml` with `deploy
 Once you decide on a template we recommend that you remove this link and rename the selected deploy template file to `deploy-template.yaml`.
 
 If desired you may edit either deploy template to change the default user access by setting the default `value` of the `ROLE` parameter in the template.
+
+
+== Connection Information
+
+[bash,options="nowrap",subs="{markup-in-source}"]
+
+  * Unique session GUID: *{guid}*
+
+  * Target host FQDN: *{targethost_fqdn}*
+
+  * Username: *{ssh_username}*
+
+  * Password: *{ssh_password}*
+
+For easy access, here is the ssh command (and password) you can copy to your paste buffer.
+
+[source,options="nowrap",subs="{markup-in-source}",role="copy"]
+----
+*{ssh_command} -o "StrictHostKeyChecking no"*
+----
+
+[source,options="nowrap",subs="{markup-in-source}",role="copy"]
+----
+*{ssh_password}*
+----
+
+
+
