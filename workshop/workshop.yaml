@@ -3,11 +3,5 @@ name: Red Hat OpenTour 2022 DACH
 modules:
   activate:
     - overview
+    - 01_gitops
     - getting-started
-    - workshop-content
-    - workshop-vars
-    - openshift-cluster-access
-    - authentication
-    - terminal-configuration
-    - slide-content
-    - agnosticd-integration

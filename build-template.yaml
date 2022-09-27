@@ -8,17 +8,17 @@ metadata:
     openshift.io/display-name: Bookbag
     tags: gpte
     template.openshift.io/bindable: "false"
-  name: bookbag-build
+  name: bookbag
 
 parameters:
   - name: NAME
     required: true
-    value: bookbag-opentour-2022-dach
+    value: bookbag
   - name: BUILDER_IMAGE
     required: true
     value: quay.io/openshifthomeroom/workshop-dashboard:5.0.0
   - name: GIT_REPO
-    value: https://github.com/rbo/bookbag-opentour-2022-dach.git
+    value: https://github.com/sa-mw-dach/opentour-2022-bookbag.git
 
 objects:
   - apiVersion: image.openshift.io/v1

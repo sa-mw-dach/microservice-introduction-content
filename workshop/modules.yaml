@@ -2,6 +2,10 @@
 modules:
   overview:
     name: Overview
+    exit_sign: GitOps
+  01_gitops:
+    name: GitOps
+
   getting-started:
     name: Getting Started
     exit_sign: Workshop Content

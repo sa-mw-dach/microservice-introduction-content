@@ -3,6 +3,12 @@
 :ssh_password: %ssh_password%
 :ssh_username: %ssh_username%
 :targethost_fqdn: %targethost%
+:openshift_console_url: %openshift_console_url%
+:user: %user%
+:password: %password%
+:gitea_url: %gitea_url%
+:gitea_console_url: %gitea_console_url%
+:cluster_subdomain: %cluster_subdomain%
 :markup-in-source: verbatim,attributes,quotes
 :show_solution: true
 
@@ -170,21 +176,35 @@ sleep 3600
 
 #### Variable interpolation
 
-base_url: %base_url%
+base_url: {base_url}
 
-console_url: %console_url%
+console_url: {console_url}
 
-terminal_url: %terminal_url%
+terminal_url: {terminal_url}
 
-slides_url: %slides_url%
+slides_url: {slides_url}
 
-username: %username%
+username: {username}
 
-project_namespace: %project_namespace%
+guid: {guid}
 
-cluster_subdomain: %cluster_subdomain%
+gitea_console_url: {gitea_console_url}
 
-image_registry: %image_registry%
+openshift_console_url: {openshift_console_url}
+
+user: {user}
+
+password: {password}
+
+gitea_url: {gitea_url}
+
+login_command: {login_command}
+
+project_namespace: {project_namespace}
+
+cluster_subdomain: {cluster_subdomain}
+
+image_registry: {image_registry}
 
 #### Web site links
 
@@ -211,3 +231,40 @@ link:%terminal_url%/session/1[Session 1]
 link:%terminal_url%/session/2[Session 2]
 
 
+.Click to see solution
+[%collapsible]
+====
+
+
+[cols="1,1"]
+|===
+|Cell in column 1, header row |Cell in column 2, header row 
+
+|GUID
+|{guid}
+
+|Cell in column 1, row 3
+|Cell in column 2, row 3
+
+|Cell in column 1, row 4
+|Cell in column 2, row 4
+|===
+
+
+[source,yaml]
+----
+package mrhaki;
+
+import io.micronaut.runtime.Micronaut;
+
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}
+----
+
+
+asdfasd
+f

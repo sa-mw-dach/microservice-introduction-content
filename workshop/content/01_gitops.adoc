@@ -1,0 +1,47 @@
+:GUID: %guid%
+:CLUSTER_SUBDOMAIN: %cluster_subdomain%
+:markup-in-source: verbatim,attributes,quotes
+:source-highlighter: rouge
+
+== Deploy application
+
+{GUID}
+
+{CLUSTER_SUBDOMAIN}
+
+-u a
+=> tools anschauen
+
+
+[,yaml]
+--------------------------
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: rbohne-main
+  project: default
+  source:
+    path: deploy {GUID}
+    repoURL: https://{CLUSTER_SUBDOMAIN}/opentour-2022-hello-gitops
+    targetRevision: main
+--------------------------
+
+=> Check application
+
+-> Git tea configmap anpassen
+
+?? wie oft sync argocdo? Autosyn on
+?? C:wq
+onfigMap Update -> Deployment don't update?? GitOPS solution?
+
+=> Pipeline via Gui
+
+=>
+
+
+
