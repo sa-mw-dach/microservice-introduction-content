@@ -1,9 +1,87 @@
 :GUID: %guid%
-:CLUSTER_SUBDOMAIN: %cluster_subdomain%
+:APPS: %cluster_subdomain%
+:USER: %user%
+:PASSWORD: %password%
+
 :markup-in-source: verbatim,attributes,quotes
 :source-highlighter: rouge
 
-== Deploy application
+== Simple GitOps Application Deployment
+
+Open OpenShift GitOps:
+
+https://argocd-server-{USER}-gitops.{APPS}
+
+
+*Accept Certificate*
+
+image:01_gitops/accept-certificate.png[Screenshot: Accept zertificate,width=1024]
+
+
+image:01_gitops/gitops-login.png[Screenshot: GitOps Login]
+
+
+Username: {USER}
+Password: {PASSWORD}
+
+
+[cols="1,1"]
+|===
+|Field|Value 
+
+2+|GENERAL
+
+
+
+|Application Name
+|`hello-main`
+
+|Project Name
+|`default`
+
+|Sync Policy|`Automatic`
+
+2+|SOURCE
+
+|Repository URL|`https://gitea.{APPS}/{USER}/hello-gitops.git`
+|Revision|`main`
+|Path|`deploy/`
+
+2+|DESTINATION
+|Cluster URL|`https://kubernetes.default.svc`
+|Namespace|`{USER}-hello-main`
+
+
+|===
+
+
+Open OpenShift Console
+
+https://console-openshift-console.{APPS}
+
+
+Open 
+
+https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
+
+Change 
+[source,yaml,linenums]
+```
+          env:
+            - name: LOCATION
+              value: Munich
+```
+
+
+Open GitOps WebUi
+
+https://https://argocd-server-{USER}-gitops.{APPS}/applications/hello-main
+
+
+
+---------
+
+
 
 {GUID}
 
