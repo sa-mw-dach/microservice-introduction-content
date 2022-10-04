@@ -15,10 +15,11 @@ https://argocd-server-{USER}-gitops.{APPS}
 
 *Accept Certificate*
 
-image:01_gitops/accept-certificate.png[Screenshot: Accept zertificate,width=1024]
+
+image:media/gitops-accept-certificate.png[Screenshot: Accept zertificate,width=1024]
 
 
-image:01_gitops/gitops-login.png[Screenshot: GitOps Login]
+image:media/gitops-login.png[Screenshot: GitOps Login]
 
 
 Username: {USER}
