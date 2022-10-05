@@ -8,119 +8,76 @@
 
 == Simple GitOps Application Deployment
 
-Open OpenShift GitOps:
+
+===== Open OpenShift GitOps:
 
 https://argocd-server-{USER}-gitops.{APPS}
 
 
-*Accept Certificate*
-
-
-image:media/gitops-accept-certificate.png[Screenshot: Accept zertificate,width=1024]
-
-
-image:media/gitops-login.png[Screenshot: GitOps Login]
-
-
-Username: {USER}
-Password: {PASSWORD}
-
-
-[cols="1,1"]
+[%autowidth]
 |===
-|Field|Value 
+h|Username|`{USER}`
+h|Password|`{PASSWORD}`
+|===
 
-2+|GENERAL
+image:gitops-assets/argo-login.mkv.gif[]
 
 
+===== Create GitOps Application
 
-|Application Name
+[%autowidth]
+|===
+
+2+h|GENERAL
+
+h|Application Name
 |`hello-main`
 
-|Project Name
+h|Project Name
 |`default`
 
-|Sync Policy|`Automatic`
+h|Sync Policy|`Automatic`
 
-2+|SOURCE
+2+h|*SOURCE*
 
-|Repository URL|`https://gitea.{APPS}/{USER}/hello-gitops.git`
-|Revision|`main`
-|Path|`deploy/`
+h|Repository URL|`https://gitea.{APPS}/{USER}/hello-gitops.git`
+h|Revision|`main`
+h|Path|`deploy/`
 
-2+|DESTINATION
-|Cluster URL|`https://kubernetes.default.svc`
-|Namespace|`{USER}-hello-main`
-
-
+2+h|DESTINATION
+h|*Cluster URL*|`https://kubernetes.default.svc`
+h|*Namespace*|`{USER}-hello-main`
 |===
 
+image:gitops-assets/argo-create-app.mkv.gif[]
 
-Open OpenShift Console
+===== Open OpenShift Console & Application URL
 
 https://console-openshift-console.{APPS}
 
+image:gitops-assets/webui-app.mkv.gif[]
 
-Open 
 
-https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
+Application URL: https://opentour-2022-hello-{USER}-hello-main.{APPS}
 
-Change 
+===== Change application & Sync
+
+Open three tabs:
+
+[%autowidth]
+|===
+h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
+h|OpenShift GitOps|https://argocd-server-{USER}-gitops.{APPS}
+h|Application|https://opentour-2022-hello-{USER}-hello-main.{APPS}
+|===
+
+And change in `deployment.yaml`:
 [source,yaml,linenums]
 ```
           env:
             - name: LOCATION
-              value: Munich
+              value: City
 ```
 
-
-Open GitOps WebUi
-
-https://https://argocd-server-{USER}-gitops.{APPS}/applications/hello-main
-
-
-
----------
-
-
-
-{GUID}
-
-{CLUSTER_SUBDOMAIN}
-
--u a
-=> tools anschauen
-
-
-[,yaml]
---------------------------
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: hello
-spec:
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: rbohne-main
-  project: default
-  source:
-    path: deploy {GUID}
-    repoURL: https://{CLUSTER_SUBDOMAIN}/opentour-2022-hello-gitops
-    targetRevision: main
---------------------------
-
-=> Check application
-
--> Git tea configmap anpassen
-
-?? wie oft sync argocdo? Autosyn on
-?? C:wq
-onfigMap Update -> Deployment don't update?? GitOPS solution?
-
-=> Pipeline via Gui
-
-=>
-
-
+image:gitops-assets/change-location.mkv.gif[]
 

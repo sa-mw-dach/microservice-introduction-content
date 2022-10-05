@@ -10,24 +10,41 @@
 
 
 
-Open OpenShift Console 
+===== Open OpenShift Console
 
 https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
 
+[%autowidth]
+|===
+h|Select Project|`{USER}-hello-dev`
+|===
+
+===== Create a pipeline
+
+Add -> Import from Git
+
+[%autowidth]
+|===
+2+h|Git
+h|Git Repo URL|https://gitea.{APPS}/{USER}/hello.git
+h|Import Strategy| Select "Builder Image"
+h|Builder Image| Select "Java"
+
+2+h|General
+h|Application name|hello
+h|Name|hello
+2+h|Pipelines
+h|Add pipeline|Select checkbox
+|===
 
 image:pipeline-assets/create-pipeline.mkv.gif[Screenshot: GitOps Login]
 
 
-Select Project: {USER}-hello-dev
+===== Add Gitea Build Trigger
 
+Open OpenShift Web Console https://console-openshift-console.{APPS}
 
-
-Add -> Import from Git
-
-https://gitea.{APPS}/{USER}/hello.git
-
-
-
+Deploy YAML via OpenShift Web Console:
 
 [source,yaml,subs="attributes"]
 -------
@@ -138,6 +155,72 @@ spec:
     name: el-hello-dev-pipeline-trigger-listener
     weight: 100
   wildcardPolicy: None
-  
-  
+
 -------
+
+image:pipeline-assets/build-trigger.mkv.gif[]
+
+
+
+Configure Gitea to "hit" the trigger: https://gitea.{APPS}/opentour-1/hello/settings/hooks
+
+[%autowidth]
+|===
+h|Trigger URL|http://pipeline-trigger-{USER}-hello-dev.{APPS}
+|===
+
+image:pipeline-assets/gitea-trigger.mkv.gif[]
+
+===== Change Application code
+
+Open three tabs:
+
+[%autowidth]
+|===
+h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
+h|OpenShift Web Console|https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+h|Application|https://hello-{USER}-hello-dev.{APPS}
+|===
+
+Change file `hello/src/main/java/com/redhat/opentour/HelloController.java` in Gitea and watch the pipeline is running & deployed in dev.
+
+Line 12 from:
+[source,jav,subs="attributes"]
+-------
+ctx.result(format("Hello world from %s!", LOCATION));
+-------
+Into
+[source,java,subs="attributes"]
+-------
+ctx.result(format("Hello OpenTour from %s!", LOCATION));
+-------
+
+image:pipeline-assets/app-change.mkv.gif[]
+
+===== Populate into production
+
+Open OpenShift Web console https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+
+
+Let's create an populate pipeline by hand.
+
+[%autowidth]
+|===
+h|srcImageURL|`docker://image-registry.openshift-image-registry.svc:5000/{USER}-hello-dev/hello:latest`
+h|destImageURL|`docker://image-registry.openshift-image-registry.svc:5000/opentour-1-hello-main/hello:$(params.VERSION)`
+|===
+
+image:pipeline-assets/populate.mkv.gif[]
+
+
+===== Change application image in production
+
+Open three tabs:
+
+[%autowidth]
+|===
+h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
+h|OpenShift GitOps|https://argocd-server-{USER}-gitops.{APPS}
+h|Application|https://hello-{USER}-hello-dev.{APPS}
+|===
+
