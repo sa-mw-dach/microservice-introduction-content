@@ -7,5 +7,6 @@
     "opentour_2022_dach_password":"opentour",
     "opentour_2022_dach_user":"opentour-1",
     "password":"opentour",
-    "user":"opentour-1" 
+    "user":"opentour-1",
+    "cluster_subdomain": "apps.cluster-95vm4.95vm4.sandbox841.opentlc.com"
 }
