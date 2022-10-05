@@ -1,0 +1,28 @@
+:GUID: %guid%
+:APPS: %cluster_subdomain%
+:USER: %user%
+:PASSWORD: %password%
+
+:markup-in-source: verbatim,attributes,quotes
+:source-highlighter: rouge
+
+== Let's build
+
+
+
+Open OpenShift Console 
+
+https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+
+Select Project: {USER}-hello-dev
+
+Add -> Import from Git
+
+https://gitea.{APPS}/{USER}/hello.git
+
+
+
+[source,yaml]
+-------
+include::pipeline-assets/pipeline-trigger.yaml[]
+-------

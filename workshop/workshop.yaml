@@ -4,4 +4,5 @@ modules:
   activate:
     - overview
     - 01_gitops
+    - 02_pipeline
     - getting-started

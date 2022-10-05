@@ -1,0 +1,107 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: hello-dev-pipeline-trigger-template
+  annotations:
+    triggers.tekton.dev/old-escape-quotes: 'true'
+spec:
+  params:
+    - name: repo
+      description: The Git repo name
+    - name: branch
+      description: The Git repo branch name
+    - name: hook-type
+      description: The Webhook type - branch or tag
+    - name: username
+      description: The user that created the branch
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: hello-
+        labels:
+          app.kubernetes.io/instance: hello
+          app.kubernetes.io/name: hello
+          pipeline.openshift.io/runtime: java
+          pipeline.openshift.io/runtime-version: openjdk-17-ubi8
+          pipeline.openshift.io/type: kubernetes
+          tekton.dev/pipeline: hello
+      spec:
+        params:
+          - name: APP_NAME
+            value: hello
+          - name: GIT_REPO
+            value: $(tt.params.repo)
+          - name: GIT_REVISION
+            value: $(tt.params.branch)
+          - name: PATH_CONTEXT
+            value: .
+          - name: VERSION
+            value: openjdk-17-ubi8
+        pipelineRef:
+          name: hello
+        serviceAccountName: pipeline
+        timeout: 1h0m0s
+        workspaces:
+          - name: workspace
+            volumeClaimTemplate:
+              metadata:
+                creationTimestamp: null
+                labels:
+                  tekton.dev/pipeline: hello
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: hello-dev-pipeline-trigger-binding
+spec:
+  params:
+    - name: repo
+      value: "$(body.repository.clone_url)"
+    - name: branch
+      value: "$(body.ref)"
+    - name: hook-type
+      value: "$(header.X-Gitea-Event)"
+    - name: username
+      value: "$(body.sender.username)"
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: hello-dev-pipeline-trigger
+spec:
+  interceptors: []
+  bindings:
+  - ref: hello-dev-pipeline-trigger-binding
+  template:
+    ref: hello-dev-pipeline-trigger-template
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: hello-dev-pipeline-trigger-listener
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - triggerRef: hello-dev-pipeline-trigger
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: pipeline-trigger
+spec:
+  port:
+    targetPort: http-listener
+  to:
+    kind: Service
+    name: el-hello-dev-pipeline-trigger-listener
+    weight: 100
+  wildcardPolicy: None
