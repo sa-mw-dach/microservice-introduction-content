@@ -196,7 +196,30 @@ podman run -ti -p 8080:10080 \
     -v $(pwd)/workshop/:/opt/app-root/workshop/:z \
     -v $(pwd)/envvars/:/opt/app-root/envvars/:z \
     -e WORKSHOP_VARS="$(cat workshop-vars.json )" \
+    -e CLUSTER_SUBDOMAIN=$(oc get ingresscontroller/default -n openshift-ingress-operator -o jsonpath="{.status.domain}") \
     --rm bookbag
 
 open http://localhost:8008/workshop
+----
+
+
+## Screen recording & Gif
+
+----
+WINDOW=$(swaymsg -t get_tree | \
+    jq -r '..
+        | select(.pid? and .visible?)
+        | "\(.rect.x+.current_border_width),\(.rect.y+.current_border_width) \(.rect.width-(.current_border_width*2))x\(.rect.height-(.current_border_width*2))"
+    ' | slurp)
+    
+wf-recorder -g "$WINDOW" -f out.mkv 
+  -t 3 \
+
+ffmpeg \
+  -ss 00:00:00.000 \
+  -i create-pipeline.mkv \
+  -vf "fps=10,scale=1024:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" \
+  -loop 1 \
+  create-pipeline.mkv.gif
+
 ----
