@@ -8,16 +8,12 @@ image::media/Website_wordmark_1280x300px_0.png[]
 
 == Overview
 
-
 [cols="1,1"]
 |===
-|Name|URL 
+|Name|URL
 
 |OpenShift WebUI
 |https://console-openshift-console.{APPS}
-
-|oc login command
-|`sdf {GUID}`
 
 |Git Server
 |https://gitea.{APPS}
