@@ -5,4 +5,4 @@ modules:
     - overview
     - 01_gitops
     - 02_pipeline
-    - getting-started
+    - 03_service-mesh

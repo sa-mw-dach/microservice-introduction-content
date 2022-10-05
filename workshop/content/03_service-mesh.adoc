@@ -1,0 +1,10 @@
+:GUID: %guid%
+:APPS: %cluster_subdomain%
+:USER: %user%
+:PASSWORD: %password%
+
+:markup-in-source: verbatim,attributes,quotes
+:source-highlighter: rouge
+
+== Service Mesh
+
