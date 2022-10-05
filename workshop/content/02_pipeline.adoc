@@ -215,12 +215,29 @@ image:pipeline-assets/populate.mkv.gif[]
 
 ===== Change application image in production
 
-Open three tabs:
+Open four tabs:
 
 [%autowidth]
 |===
 h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
 h|OpenShift GitOps|https://argocd-server-{USER}-gitops.{APPS}
-h|Application|https://hello-{USER}-hello-dev.{APPS}
+h|Production Application|https://opentour-2022-hello-{USER}-hello-main.{APPS}
+h|OpenShift Web console|https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+
 |===
 
+
+Change file `hello-gitops/deploy/deployment.yaml` in Gitea and watch the pipeline is running & deployed in dev.
+
+Line 26 from:
+[source,jav,subs="attributes"]
+-------
+image: quay.io/sa-mw-dach/opentour-2022-hello:main
+-------
+Into
+[source,java,subs="attributes"]
+-------
+image: image-registry.openshift-image-registry.svc:5000/opentour-1-hello-main/hello:v01
+-------
+
+image:pipeline-assets/change-production-image.mkv.gif[]
