@@ -21,9 +21,6 @@ image::media/Website_wordmark_1280x300px_0.png[]
 |OpenShift GitOps / ArgoCD
 |https://argocd-server-{USER}-gitops.{APPS}
 
-|OpenShift GitOps / ArgoCD
-|https://argocd-server-{USER}-gitops.{APPS}
-
 |OpenShift Service Mesh - Kiali
 |https://kiali-{USER}-service-mesh-system.{APPS}
 
