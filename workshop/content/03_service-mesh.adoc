@@ -14,7 +14,7 @@
 
 ===== Open OpenShift Console
 
-https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+https://console-openshift-console.{APPS}
 
 [%autowidth]
 |===
@@ -27,7 +27,9 @@ Check the operators installed in the Admin perspective, Operators. All Service M
 
 Clone the project repo to you local file system:
 
-git clone git@github.com:nikolaus-lemberski/opentour-2022-servicemesh.git
+```
+git clone https://github.com/sa-mw-dach/opentour-2022-servicemesh.git
+```
 
 ===== Deploy the sample apps
 
@@ -38,7 +40,8 @@ oc create -f kubernetes/c-v1-deploy.yml
 oc create -f kubernetes/c-v2-deploy.yml
 oc expose svc service-a
 oc get route
-curl _route_
+ROUTE=....
+curl $ROUTE
 ```
 
 If everything works as expected and you get a result from curl, continue.
@@ -72,17 +75,23 @@ oc get pod
 oc create -f kubernetes/gateway.yml
 oc get route istio-ingressgateway -n {USER}-service-mesh-system
 
-curl _gateway_/service-a
+GATEWAY=....
+curl $GATEWAY/service-a
 ```
 
 If the services respond correctly, continue.
 
 ===== Canary Releases
 
-`oc create -f kubernetes/destination-rules.yml``
+```
+oc create -f kubernetes/destination-rules.yml
+```
 
 Open a second terminal and run:  
-`while true; do curl _route_/service-a; sleep 0.5; done`
+```
+ROUTE=...
+while true; do curl $ROUTE/service-a; sleep 0.5; done
+```
 
 Now in your first terminal apply the files for the Canary Deployment:
 
@@ -98,21 +107,24 @@ Check Kiali and Jaeger, you can open these from OpenShift Console (Networing Rou
 ===== Circuit Breaker and Retry
 
 Let the terminal with the curl loop running or open a new one:  
-`while true; do curl _route_/service-a; sleep 0.5; done``
+```
+while true; do curl _route_/service-a; sleep 0.5; done
+```
 
 ```
 oc scale deploy/service-c-v1 --replicas 0
 oc scale deploy/service-c-v2 --replicas 2
 oc replace -f kubernetes/circuit-breaker/1-vs.yml
 oc get pod
-````
+```
 
 In a separate terminal, run
 
 ```
-oc port-forward pod/<i>service-c-v2-pod</i> 8080:8080
+POD_NAME=....
+oc port-forward pod/$POD_NAME 8080:8080
 curl localhost:8080/crash
-````
+```
 
 See what happens in the terminal with the curl loop.
 
@@ -124,7 +136,9 @@ oc replace -f kubernetes/circuit-breaker/3-vs-retry.yml
 ```
 
 Finally repair the crashed service:  
-`curl localhost:8080/repair`
+```
+curl localhost:8080/repair
+```
 
 After ~10 seconds the repaired pod gets traffic.
 
