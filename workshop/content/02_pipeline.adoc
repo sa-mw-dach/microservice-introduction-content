@@ -12,7 +12,7 @@
 
 ===== Open OpenShift Console
 
-https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+https://console-openshift-console.{APPS}/topology/ns/{USER}-hello-dev?view=graph
 
 [%autowidth]
 |===
@@ -162,7 +162,7 @@ image:pipeline-assets/build-trigger.mkv.gif[]
 
 
 
-Configure Gitea to "hit" the trigger: https://gitea.{APPS}/opentour-1/hello/settings/hooks
+Configure Gitea to "hit" the trigger: https://gitea.{APPS}/{USER}/hello/settings/hooks
 
 [%autowidth]
 |===
@@ -178,7 +178,7 @@ Open three tabs:
 [%autowidth]
 |===
 h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
-h|OpenShift Web Console|https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+h|OpenShift Web Console|https://console-openshift-console.{APPS}/topology/ns/{USER}-hello-dev?view=graph
 h|Application|https://hello-{USER}-hello-dev.{APPS}
 |===
 
@@ -199,7 +199,7 @@ image:pipeline-assets/app-change.mkv.gif[]
 
 ===== Populate into production
 
-Open OpenShift Web console https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+Open OpenShift Web console https://console-openshift-console.{APPS}/topology/ns/{USER}-hello-dev?view=graph
 
 
 Let's create an populate pipeline by hand.
@@ -207,7 +207,7 @@ Let's create an populate pipeline by hand.
 [%autowidth]
 |===
 h|srcImageURL|`docker://image-registry.openshift-image-registry.svc:5000/{USER}-hello-dev/hello:latest`
-h|destImageURL|`docker://image-registry.openshift-image-registry.svc:5000/opentour-1-hello-main/hello:$(params.VERSION)`
+h|destImageURL|`docker://image-registry.openshift-image-registry.svc:5000/{USER}-hello-main/hello:$(params.VERSION)`
 |===
 
 image:pipeline-assets/populate.mkv.gif[]
@@ -222,7 +222,7 @@ Open four tabs:
 h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
 h|OpenShift GitOps|https://argocd-server-{USER}-gitops.{APPS}
 h|Production Application|https://opentour-2022-hello-{USER}-hello-main.{APPS}
-h|OpenShift Web console|https://console-openshift-console.{APPS}/topology/ns/opentour-1-hello-dev?view=graph
+h|OpenShift Web console|https://console-openshift-console.{APPS}/topology/ns/{USER}-hello-dev?view=graph
 
 |===
 
@@ -237,7 +237,7 @@ image: quay.io/sa-mw-dach/opentour-2022-hello:main
 Into
 [source,java,subs="attributes"]
 -------
-image: image-registry.openshift-image-registry.svc:5000/opentour-1-hello-main/hello:v01
+image: image-registry.openshift-image-registry.svc:5000/{USER}-hello-main/hello:v01
 -------
 
 image:pipeline-assets/change-production-image.mkv.gif[]
