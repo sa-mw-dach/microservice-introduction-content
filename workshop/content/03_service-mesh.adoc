@@ -93,12 +93,12 @@ while true; do curl $ROUTE/service-a; sleep 0.5; done
 oc scale deploy/service-c-v1 --replicas 0
 oc scale deploy/service-c-v2 --replicas 2
 oc replace -f {REPO}/kubernetes/circuit-breaker/1-vs.yml
+```
+
+Now connect to service-c and let it crash... in a separate terminal, run
+
+```
 oc get pod
-```
-
-In a separate terminal, run
-
-```
 POD_NAME=....
 oc port-forward pod/$POD_NAME 8080:8080
 curl localhost:8080/crash
