@@ -31,10 +31,11 @@ You can find all project files on Github:
 
 https://github.com/sa-mw-dach/opentour-2022-servicemesh.git
 
-But you don't need to clone the repo, you can apply the files directly to your OpenShift cluster. 
+But you don't need to clone the repo, you can apply the files directly to your OpenShift cluster.
 
 === Deploy the sample apps
 
+[source,subs="attributes"]
 ```
 oc create -f {REPO}/kubernetes/a-deploy.yml
 oc create -f {REPO}/kubernetes/b-deploy.yml
@@ -48,6 +49,7 @@ Check the pods - all pods should be running and you should see in the READY colu
 
 Now we create a Gateway and expose our service-a.
 
+[source,subs="attributes"]
 ```
 oc create -f oc create -f {REPO}/kubernetes/gateway.yml
 oc get route istio-ingressgateway -n {USER}-service-mesh-system
@@ -60,11 +62,12 @@ If the services respond correctly, continue.
 
 === Canary Releases
 
+[source,subs="attributes"]
 ```
 oc create -f {REPO}/kubernetes/destination-rules.yml
 ```
 
-Open a second terminal and run:  
+Open a second terminal and run:
 ```
 ROUTE=...
 while true; do curl $ROUTE/service-a; sleep 0.5; done
@@ -72,6 +75,7 @@ while true; do curl $ROUTE/service-a; sleep 0.5; done
 
 Now in your first terminal apply the files for the Canary Deployment:
 
+[source,subs="attributes"]
 ```
 oc create -f {REPO}/kubernetes/canary/1-vs-v1.yml
 oc replace -f {REPO}/kubernetes/canary/2-vs-v1_and_v2_90_10.yml
@@ -83,12 +87,13 @@ Check Kiali and Jaeger, you can open these from OpenShift Console (Networing Rou
 
 === Circuit Breaker and Retry
 
-Let the terminal with the curl loop running or open a new one:  
+Let the terminal with the curl loop running or open a new one:
 ```
 ROUTE=...
 while true; do curl $ROUTE/service-a; sleep 0.5; done
 ```
 
+[source,subs="attributes"]
 ```
 oc scale deploy/service-c-v1 --replicas 0
 oc scale deploy/service-c-v2 --replicas 2
@@ -108,12 +113,13 @@ See what happens in the terminal with the curl loop.
 
 Now apply the Circuit Breaker (check what happens), then the Retry policy.
 
+[source,subs="attributes"]
 ```
 oc replace -f {REPO}/kubernetes/circuit-breaker/2-destination-rules.yml
 oc replace -f {REPO}/kubernetes/circuit-breaker/3-vs-retry.yml
 ```
 
-Finally repair the crashed service:  
+Finally repair the crashed service:
 ```
 curl localhost:8080/repair
 ```
