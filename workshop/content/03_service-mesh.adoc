@@ -6,13 +6,15 @@
 :user: %user%
 :password: %password%
 
+:REPO: https://raw.githubusercontent.com/sa-mw-dach/opentour-2022-servicemesh/main
+
 :markup-in-source: verbatim,attributes,quotes
 :source-highlighter: rouge
 
 == Service Mesh
 
 
-===== Open OpenShift Console
+=== Open OpenShift Console
 
 https://console-openshift-console.{APPS}
 
@@ -23,56 +25,31 @@ h|Select Project|`{USER}-service-mesh-system`
 
 Check the operators installed in the Admin perspective, Operators. All Service Mesh related Operators should be there and ready.
 
-===== Project files on Github
+=== Project files on Github
 
-Clone the project repo to you local file system:
+You can find all project files on Github:
 
-```
-git clone https://github.com/sa-mw-dach/opentour-2022-servicemesh.git
-```
+https://github.com/sa-mw-dach/opentour-2022-servicemesh.git
 
-===== Deploy the sample apps
+But you don't need to clone the repo, you can apply the files directly to your OpenShift cluster. 
 
-```
-oc create -f kubernetes/a-deploy.yml
-oc create -f kubernetes/b-deploy.yml
-oc create -f kubernetes/c-v1-deploy.yml
-oc create -f kubernetes/c-v2-deploy.yml
-oc expose svc service-a
-oc get route
-ROUTE=....
-curl $ROUTE
-```
-
-If everything works as expected and you get a result from curl, continue.
+=== Deploy the sample apps
 
 ```
-oc delete route service-a
+oc create -f {REPO}/kubernetes/a-deploy.yml
+oc create -f {REPO}/kubernetes/b-deploy.yml
+oc create -f {REPO}/kubernetes/c-v1-deploy.yml
+oc create -f {REPO}/kubernetes/c-v2-deploy.yml
 ```
 
-===== Use the Service Mesh
+Check the pods - all pods should be running and you should see in the READY column "2/2". Why 2? In the pod are 2 containers - one for the app and one for the Envoy Sidecar.
 
-All Service Mesh Operators and the ServiceMeshControlPlane are already installed in your {USER}-service-mesh-system workspace. The only missing part ist the ServiceMeshMemberRoll:
+=== Create a Gateway for Ingress
 
-First adapt the namespaces in kubernetes/memberroll.yml to your project names, then apply:
-
-```
-oc create -f kubernetes/memberroll.yml
-```
-
-Now delete the pods. They're recreated and now include the Envoy Sidecar.
+Now we create a Gateway and expose our service-a.
 
 ```
-oc delete pod -l app=service-a
-oc delete pod -l app=service-b
-oc delete pod -l app=service-c
-oc get pod
-```
-
-===== Create a Gateway for Ingress
-
-```
-oc create -f kubernetes/gateway.yml
+oc create -f oc create -f {REPO}/kubernetes/gateway.yml
 oc get route istio-ingressgateway -n {USER}-service-mesh-system
 
 GATEWAY=....
@@ -81,10 +58,10 @@ curl $GATEWAY/service-a
 
 If the services respond correctly, continue.
 
-===== Canary Releases
+=== Canary Releases
 
 ```
-oc create -f kubernetes/destination-rules.yml
+oc create -f {REPO}/kubernetes/destination-rules.yml
 ```
 
 Open a second terminal and run:  
@@ -96,31 +73,32 @@ while true; do curl $ROUTE/service-a; sleep 0.5; done
 Now in your first terminal apply the files for the Canary Deployment:
 
 ```
-oc create -f kubernetes/canary/1-vs-v1.yml
-oc replace -f kubernetes/canary/2-vs-v1_and_v2_90_10.yml
-oc replace -f kubernetes/canary/3-vs-v1_and_v2_50_50.yml
-oc replace -f kubernetes/canary/4-vs-v2.yml
+oc create -f {REPO}/kubernetes/canary/1-vs-v1.yml
+oc replace -f {REPO}/kubernetes/canary/2-vs-v1_and_v2_90_10.yml
+oc replace -f {REPO}/kubernetes/canary/3-vs-v1_and_v2_50_50.yml
+oc replace -f {REPO}/kubernetes/canary/4-vs-v2.yml
 ```
 
 Check Kiali and Jaeger, you can open these from OpenShift Console (Networing Routes).
 
-===== Circuit Breaker and Retry
+=== Circuit Breaker and Retry
 
 Let the terminal with the curl loop running or open a new one:  
 ```
-while true; do curl _route_/service-a; sleep 0.5; done
+ROUTE=...
+while true; do curl $ROUTE/service-a; sleep 0.5; done
 ```
 
 ```
 oc scale deploy/service-c-v1 --replicas 0
 oc scale deploy/service-c-v2 --replicas 2
-oc replace -f kubernetes/circuit-breaker/1-vs.yml
+oc replace -f {REPO}/kubernetes/circuit-breaker/1-vs.yml
+```
+
+Now connect to service-c and let it crash... in a separate terminal, run
+
+```
 oc get pod
-```
-
-In a separate terminal, run
-
-```
 POD_NAME=....
 oc port-forward pod/$POD_NAME 8080:8080
 curl localhost:8080/crash
@@ -131,8 +109,8 @@ See what happens in the terminal with the curl loop.
 Now apply the Circuit Breaker (check what happens), then the Retry policy.
 
 ```
-oc replace -f kubernetes/circuit-breaker/2-destination-rules.yml
-oc replace -f kubernetes/circuit-breaker/3-vs-retry.yml
+oc replace -f {REPO}/kubernetes/circuit-breaker/2-destination-rules.yml
+oc replace -f {REPO}/kubernetes/circuit-breaker/3-vs-retry.yml
 ```
 
 Finally repair the crashed service:  
