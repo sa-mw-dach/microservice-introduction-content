@@ -35,6 +35,14 @@ But you don't need to clone the repo, you can apply the files directly to your O
 
 === Deploy the sample apps
 
+First, switch to the apps project:
+[source,subs="attributes"]
+```
+oc project {USER}-service-mesh-app
+```
+
+Then apply the deployment files for the apps:
+
 [source,subs="attributes"]
 ```
 oc create -f {REPO}/kubernetes/a-deploy.yml
