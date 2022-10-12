@@ -59,7 +59,7 @@ Now we create a Gateway and expose our service-a.
 
 [source,subs="attributes"]
 ```
-oc create -f oc create -f {REPO}/kubernetes/gateway.yml
+oc create -f {REPO}/kubernetes/gateway.yml
 oc get route istio-ingressgateway -n {USER}-service-mesh-system
 
 GATEWAY=....
