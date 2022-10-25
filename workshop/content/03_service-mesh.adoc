@@ -75,9 +75,6 @@ image:servicemesh-assets/control_data_plane.png[Control Plane and Data Plane]
 
 ## The sample apps
 
-
-
-
 We have 3 sample apps, called Service A, B and C.
 
 * Service A: Python app which calls Service B
