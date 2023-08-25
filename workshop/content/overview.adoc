@@ -1,26 +1,38 @@
 :GUID: %guid%
 :APPS: %cluster_subdomain%
 :USER: %user%
+:PASSWORD: %password%
 
 :markup-in-source: verbatim,attributes,quotes
 
+
+
+
+
+== Start your Web Terminal
+
+Open OpenShift WebConsole and Login:
+
 [cols="1,1"]
 |===
-|Name|URL
-
 |OpenShift WebUI
 |https://console-openshift-console.{APPS}
 
-|Git Server
-|https://gitea.{APPS}
+|Username:
+|{USER}
 
-|OpenShift GitOps / ArgoCD
-|https://argocd-server-{USER}-gitops.{APPS}
+|Password
+|{PASSWORD}
 
-|OpenShift Service Mesh - Kiali
-|https://kiali-{USER}-service-mesh-system.{APPS}
+|Select namespace
+|{USER}-dev
 
 
 |===
+
+
+video::overview-assets/terminal.mp4[]
+
+
 
 
