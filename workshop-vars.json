@@ -1,12 +1,12 @@
 {
     "console_url":"https://console-openshift-console.apps.cluster-99zkj.99zkj.sandbox2341.opentlc.com",
     "guid":"99zkj",
-    "login_command":"oc login -u opentour-1 -p opentour https://api.cluster-99zkj.99zkj.sandbox2341.opentlc.com:6443",
+    "login_command":"oc login -u user-1 -p password https://api.cluster-99zkj.99zkj.sandbox2341.opentlc.com:6443",
     "opentour_2022_dach_console_url":"https://console-openshift-console.apps.cluster-99zkj.99zkj.sandbox2341.opentlc.com",
-    "opentour_2022_dach_login_command":"oc login -u opentour-1 -p opentour https://api.cluster-99zkj.99zkj.sandbox2341.opentlc.com:6443",
-    "opentour_2022_dach_password":"opentour",
-    "opentour_2022_dach_user":"opentour-1",
-    "password":"opentour",
-    "user":"opentour-1",
+    "opentour_2022_dach_login_command":"oc login -u user-1 -p password https://api.cluster-99zkj.99zkj.sandbox2341.opentlc.com:6443",
+    "opentour_2022_dach_password":"password",
+    "opentour_2022_dach_user":"user-1",
+    "password":"password",
+    "user":"user-1",
     "cluster_subdomain": "apps.cluster-95vm4.95vm4.sandbox841.opentlc.com"
 }
