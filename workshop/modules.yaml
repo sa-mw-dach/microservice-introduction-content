@@ -1,13 +1,13 @@
 ---
 modules:
   overview:
-    name: Overview
-    exit_sign: GitOps
-  01_gitops:
-    name: GitOps
+    name: Start (Environment Overview)
     exit_sign: Pipeline
-  02_pipeline:
+  01_pipeline:
     name: Pipeline
+    exit_sign: GitOps
+  02_gitops:
+    name: GitOps
     exit_sign: Service Mesh
   03_service-mesh:
     name: Service Mesh
