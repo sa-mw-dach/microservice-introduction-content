@@ -1,0 +1,40 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-app
+  namespace: {USER}-dev
+spec:
+  params:
+    - default: app-a
+      description: 'Application name app-a, app-b, app-c'
+      name: app
+      type: string
+  tasks:
+    - name: git-clone
+      params:
+        - name: url
+          value: >-
+            https://gitea.{APPS}/{USER}/$(params.app).git
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: source
+    - name: buildah
+      params:
+        - name: IMAGE
+          value: >-
+            image-registry.openshift-image-registry.svc:5000/{USER}-app/$(params.app):main
+        - name: DOCKERFILE
+          value: ./Containerfile
+      runAfter:
+        - git-clone
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: source
+  workspaces:
+    - name: source

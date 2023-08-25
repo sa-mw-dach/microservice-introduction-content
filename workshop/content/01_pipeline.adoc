@@ -21,6 +21,19 @@ h|Select Project|`{USER}-dev`
 ===== Create a pipeline
 
 
+.Solution
+[%collapsible]
+====
+
+
+
+[source,yaml]
+----
+include::pipeline-assets/pipeline.yaml[]
+----
+====
+
+
 Create pipeline
 Pipeline name: build-app
 Add parameter application
