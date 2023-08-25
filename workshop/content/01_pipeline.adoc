@@ -9,17 +9,24 @@
 == Let's build
 
 
-
 ===== Open OpenShift Console
 
-https://console-openshift-console.{APPS}/topology/ns/{USER}-hello-dev?view=graph
+https://console-openshift-console.{APPS}/topology/ns/{USER}-dev?view=graph
 
 [%autowidth]
 |===
-h|Select Project|`{USER}-hello-dev`
+h|Select Project|`{USER}-dev`
 |===
 
 ===== Create a pipeline
+
+
+Create pipeline
+Pipeline name: build-app
+Add parameter application
+Add Workspace source
+Add git-clone
+Add buildah task
 
 Add -> Import from Git
 
