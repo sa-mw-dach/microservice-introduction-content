@@ -20,16 +20,12 @@ h|Select Project|`{USER}-dev`
 
 ===== Create a pipeline
 
-
 .Solution
 [%collapsible]
 ====
-
-
-
-[source,yaml]
+[source,yaml,subs="attributes"]
 ----
-include::pipeline-assets/pipeline.yaml[]
+include::content/pipeline-assets/pipeline.yaml[]
 ----
 ====
 

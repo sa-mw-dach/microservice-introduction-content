@@ -10,6 +10,11 @@ RUN rm -rf /tmp/src/.git* && \
     chmod -R g+w /tmp/src && \
     yum install -y vim-enhanced
 
+# Fixed include::
+RUN cd /opt/workshop/renderer && \
+    rm -rf content && \
+    ln -s /opt/app-root/workshop/content
+
 USER 1001
 
 RUN /usr/libexec/s2i/assemble
