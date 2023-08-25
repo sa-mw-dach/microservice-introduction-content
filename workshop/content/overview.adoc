@@ -11,24 +11,22 @@
 
 == Start your Web Terminal
 
-Open OpenShift WebConsole and Login:
 
-[%autowidth]
-|===
-|OpenShift WebUI
-|https://console-openshift-console.{APPS}
-
-|Username:
-|{USER}
-
-|Password
-|{PASSWORD}
-
-|Select namespace
-|{USER}-dev
+1. Open OpenShift WebConsole and Login: https://console-openshift-console.{APPS}[window=_blank]]
 
 
-|===
+2. Fill out the Login form:
++
+Username: `{USER}`
++
+Password: `{PASSWORD}`
+
+
+3. Select project/namespace: `{USER}-dev`
+
+4. Click `>_` Icon on the top right corner
+
+5. Click Start to start your Web Terminal
 
 
 video::overview-assets/terminal.mp4[width=1024]
