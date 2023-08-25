@@ -18,7 +18,7 @@ parameters:
     required: true
     value: quay.io/openshifthomeroom/workshop-dashboard:5.0.0
   - name: GIT_REPO
-    value: https://github.com/sa-mw-dach/opentour-2022-bookbag.git
+    value: https://github.com/sa-mw-dach/microservice-introduction-content.git
 
 objects:
   - apiVersion: image.openshift.io/v1
@@ -37,7 +37,7 @@ objects:
           name: ${NAME}:latest
       source:
         git:
-          ref: master
+          ref: main
           uri: ${GIT_REPO}
         type: Git
       strategy:
@@ -47,4 +47,11 @@ objects:
             name: ${BUILDER_IMAGE}
         type: Source
       # Manually trigger builds.
-      triggers: []
+      triggers:
+        # oc create secret generic github-build-secret --from-literal=WebHookSecretKey=
+        - type: GitHub
+          github:
+            secretReference:
+              name: github-build-secret
+
+
