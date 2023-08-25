@@ -3,6 +3,6 @@ name: Red Hat OpenTour 2022 DACH
 modules:
   activate:
     - overview
-    - 01_gitops
-    - 02_pipeline
+    - 01_pipeline
+    - 02_gitops
     - 03_service-mesh
