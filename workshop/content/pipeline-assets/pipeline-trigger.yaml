@@ -1,7 +1,8 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: hello-dev-pipeline-trigger-template
+  name: build-app-pipeline-trigger-template
+  namespace: {USER}-dev
   annotations:
     triggers.tekton.dev/old-escape-quotes: 'true'
 spec:
@@ -14,22 +15,17 @@ spec:
       description: The Webhook type - branch or tag
     - name: username
       description: The user that created the branch
+    - name: repo_name
+      description: "Name of the repo/app: app-a, app-b or app-c"
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: hello-
-        labels:
-          app.kubernetes.io/instance: hello
-          app.kubernetes.io/name: hello
-          pipeline.openshift.io/runtime: java
-          pipeline.openshift.io/runtime-version: openjdk-17-ubi8
-          pipeline.openshift.io/type: kubernetes
-          tekton.dev/pipeline: hello
+        generateName: build-app-
       spec:
         params:
-          - name: APP_NAME
-            value: hello
+          - name: app
+            value: $(tt.params.repo_name)
           - name: GIT_REPO
             value: $(tt.params.repo)
           - name: GIT_REVISION
@@ -39,16 +35,12 @@ spec:
           - name: VERSION
             value: openjdk-17-ubi8
         pipelineRef:
-          name: hello
+          name: build-app
         serviceAccountName: pipeline
         timeout: 1h0m0s
         workspaces:
-          - name: workspace
+          - name: source
             volumeClaimTemplate:
-              metadata:
-                creationTimestamp: null
-                labels:
-                  tekton.dev/pipeline: hello
               spec:
                 accessModes:
                   - ReadWriteOnce
@@ -60,11 +52,15 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: hello-dev-pipeline-trigger-binding
+  name: build-app-pipeline-trigger-binding
+  namespace: {USER}-dev
 spec:
+  # https://docs.gitea.com/next/usage/webhooks#event-information
   params:
     - name: repo
       value: "$(body.repository.clone_url)"
+    - name: repo_name
+      value: "$(body.repository.name)"
     - name: branch
       value: "$(body.ref)"
     - name: hook-type
@@ -75,33 +71,38 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: hello-dev-pipeline-trigger
+  name: build-app-pipeline-trigger
+  namespace: {USER}-dev
 spec:
   interceptors: []
   bindings:
-  - ref: hello-dev-pipeline-trigger-binding
+  - ref: build-app-pipeline-trigger-binding
   template:
-    ref: hello-dev-pipeline-trigger-template
+    ref: build-app-pipeline-trigger-template
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: hello-dev-pipeline-trigger-listener
+  name: build-app-pipeline-trigger-listener
 spec:
   serviceAccountName: pipeline
   triggers:
-  - triggerRef: hello-dev-pipeline-trigger
+  - triggerRef: build-app-pipeline-trigger
 
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: pipeline-trigger
+  name: build-app-trigger
+  namespace: {USER}-dev
 spec:
   port:
     targetPort: http-listener
   to:
     kind: Service
-    name: el-hello-dev-pipeline-trigger-listener
+    name: el-build-app-pipeline-trigger-listener
     weight: 100
   wildcardPolicy: None
+  tls:
+    termination: edge
+  insecureEdgeTerminationPolicy: Redirect
