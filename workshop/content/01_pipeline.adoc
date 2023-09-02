@@ -9,7 +9,7 @@
 == Let's build
 
 
-===== Open OpenShift Console
+=== Open OpenShift Console
 
 https://console-openshift-console.{APPS}/topology/ns/{USER}-dev?view=graph
 
@@ -18,26 +18,77 @@ https://console-openshift-console.{APPS}/topology/ns/{USER}-dev?view=graph
 h|Select Project|`{USER}-dev`
 |===
 
-===== Create a pipeline
+=== Create a pipeline
 
-.Solution
+
+ * Create pipeline
+ * Pipeline name: build-app
+ * Add parameter application
+ * Add Workspace source
+ * Add git-clone
+ * Add buildah task
+ * Add -> Import from Git
+
+ToDo: Create Video
+
+
+.*Solution*
 [%collapsible]
 ====
-[source,yaml,subs="attributes"]
+
+Copy&paste the solution into the Web UI:
+
+ToDo: Add Provide Video
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
 include::content/pipeline-assets/pipeline.yaml[]
 ----
+
 ====
 
 
-Create pipeline
-Pipeline name: build-app
-Add parameter application
-Add Workspace source
-Add git-clone
-Add buildah task
 
-Add -> Import from Git
+=== Start pipeline for Application
+
+==== Via WebUI
+
+==== Via CLI
+
+```
+cat - > claim-template.yaml <<EOF
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+EOF
+tkn pipeline start build-app -p app=app-a -w name=source,volumeClaimTemplateFile=claim-template.yaml
+
+```
+
+
+=== Configure Trigger
+
+
+.*YAML*
+[%collapsible]
+====
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+include::content/pipeline-assets/pipeline-trigger.yaml[]
+----
+====
+
+
+
+++++
+<br/><br/><br/><br/>
+<hr/>
+<h1>OLD /  Backup</h1>
+++++
+
 
 [%autowidth]
 |===
@@ -56,7 +107,7 @@ h|Add pipeline|Select checkbox
 image:pipeline-assets/create-pipeline.mkv.gif[Screenshot: GitOps Login]
 
 
-===== Add Gitea Build Trigger
+=== Add Gitea Build Trigger
 
 Open OpenShift Web Console https://console-openshift-console.{APPS}
 
@@ -257,3 +308,4 @@ image: image-registry.openshift-image-registry.svc:5000/{USER}-hello-main/hello:
 -------
 
 image:pipeline-assets/change-production-image.mkv.gif[]
+

@@ -31,7 +31,7 @@ image:gitops-assets/argo-login.mkv.gif[]
 2+h|GENERAL
 
 h|Application Name
-|`hello-main`
+|`apps`
 
 h|Project Name
 |`default`
@@ -40,16 +40,50 @@ h|Sync Policy|`Automatic`
 
 2+h|*SOURCE*
 
-h|Repository URL|`https://gitea.{APPS}/{USER}/hello-gitops.git`
-h|Revision|`main`
-h|Path|`deploy/`
+h|Repository URL|`https://gitea.{APPS}/{USER}/gitops.git`
+h|Revision|`HEAD`
+h|Path|`.`
 
 2+h|DESTINATION
 h|*Cluster URL*|`https://kubernetes.default.svc`
-h|*Namespace*|`{USER}-hello-main`
+h|*Namespace*|`{USER}-apps`
 |===
 
 image:gitops-assets/argo-create-app.mkv.gif[]
+
+==== Fix image
+
+Added to `kustomization.yaml`
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+# Testing:
+#   kustomize edit set image app-a:latest=image-registry.openshift-image-registry.svc:5000/{USER}-apps/app-a:main
+#
+images:
+- name: app-a:latest
+  newName: image-registry.openshift-image-registry.svc:5000/{USER}-apps/app-a
+  newTag: main
+- name: app-b:latest
+  newName: image-registry.openshift-image-registry.svc:5000/{USER}-apps/app-b
+  newTag: main
+- name: app-c:latest
+  newName: image-registry.openshift-image-registry.svc:5000/{USER}-apps/app-c
+  newTag: main
+
+----
+
+
+==== Update Pipeline with update
+
+++++
+<br/><br/><br/><br/>
+<hr/>
+<h1>OLD /  Backup</h1>
+++++
+
+
+
 
 ===== Open OpenShift Console & Application URL
 
