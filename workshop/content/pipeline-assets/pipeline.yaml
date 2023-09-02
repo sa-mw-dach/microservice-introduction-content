@@ -25,7 +25,7 @@ spec:
       params:
         - name: IMAGE
           value: >-
-            image-registry.openshift-image-registry.svc:5000/{USER}-app/$(params.app):main
+            image-registry.openshift-image-registry.svc:5000/{USER}-apps/$(params.app):main
         - name: DOCKERFILE
           value: ./Containerfile
       runAfter:
