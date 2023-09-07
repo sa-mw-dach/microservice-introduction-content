@@ -46,7 +46,7 @@ Check the operators installed in the Admin perspective, Operators. All Service M
 First, switch to the apps project:
 [source,subs="attributes"]
 ```
-oc project {USER}-service-mesh-app
+oc project {USER}-apps
 ```
 
 Then apply the deployment files for the apps:
@@ -166,4 +166,62 @@ Finally repair the crashed service.
 
 After ~10 seconds the repaired pod gets traffic (Circuit Breaker goes from open to close).
 
-**Congratulations, you made it!!**
+## Authentication and Authorization
+
+We use Keycloak to manage our users. User can login via Keycloak and we configure Service Mesh to protect our services and validate a JWT against Keycloak, so only authenticated and authorized users can call our services.
+
+### Configuration
+
+Keycloak is already installed, you can find the URL in the OpenShift console or better via terminal:
+
+```bash
+KEYCLOAK_URL=https://$(oc get route keycloak --template='{{ .spec.host }}') &&
+echo "" &&
+echo "Keycloak:                 $KEYCLOAK_URL" &&
+echo "Keycloak Admin Console:   $KEYCLOAK_URL/admin" &&
+echo "Keycloak Account Console: $KEYCLOAK_URL/realms/myrealm/account" &&
+echo ""
+```
+
+In the Keycloak admin console:
+
+1. Create a realm "myrealm"
+2. Create a user "myuser" with first name and last name and set a password 'test' or anything you like better; set "Temporary to "Off"
+3. Create a client "myclient" with client type "OpenID Connect", client authentication "On", authentication flow: Standard flow, Direct access grants
+
+In "Access settings", set the root URL to your Keycloak URL (https://keycloak-keycloak.apps-crc.testing in OpenShift local).
+
+In "Advanced", set "Authentication flow overrides" to  
+* Browser Flow: browser
+* Direct Grant Flow: direct grant
+
+Now call our service-a as before (`curl $ROUTE/service-a`) and then configure Service Mesh to protect the service-a:
+
+```bash
+oc create -f {REPO_PREFIX}-servicemesh/main/auth/auth.yml
+```
+
+Call the service-a URL again you should get an "Unauthorized".
+
+### Login
+
+Get the JWT from Keycloak:
+
+```bash
+curl --insecure -L -X POST 'https://keycloak-keycloak.apps-crc.testing/realms/myrealm/protocol/openid-connect/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'client_id=myclient' \
+--data-urlencode 'grant_type=password' \
+--data-urlencode 'client_secret=<clientsecret>' \
+--data-urlencode 'scope=openid' \
+--data-urlencode 'username=myuser' \
+--data-urlencode 'password=test'
+```
+
+Then try again the service-a with the access token Bearer:
+
+```bash
+curl -H "Authorization: Bearer <token>" $ROUTE/service-a
+```
+
+Now the request is routed to the backend service. Congratulations, authentication and authorization via Keycloak and Service Mesh is done!
