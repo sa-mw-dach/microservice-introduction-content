@@ -20,6 +20,7 @@ h|Select Project|`{USER}-dev`
 
 === Create a pipeline
 
+2tln * Create git-basic-auth secret
 
  * Create pipeline
  * Pipeline name: build-app
@@ -64,7 +65,9 @@ spec:
     requests:
       storage: 1Gi
 EOF
-tkn pipeline start build-app -p app=app-a -w name=source,volumeClaimTemplateFile=claim-template.yaml
+tkn pipeline start build-app -p app=app-a -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-config,secret=git-basic-auth
+tkn pipeline start build-app -p app=app-b -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-config,secret=git-basic-auth
+tkn pipeline start build-app -p app=app-c -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-config,secret=git-basic-auth
 
 ```
 

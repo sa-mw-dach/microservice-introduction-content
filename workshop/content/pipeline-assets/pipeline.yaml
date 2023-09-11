@@ -36,5 +36,93 @@ spec:
       workspaces:
         - name: source
           workspace: source
+
+    - name: update-deployment
+      params:
+      - name: GIT_USER_NAME
+        value: Pipeline Bot
+      - name: GIT_USER_EMAIL
+        value: bot@example.com
+      - name: GIT_SCRIPT
+        value: |
+          cd $(workspaces.source.path)
+          wget  https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.1.1/kustomize_v5.1.1_linux_amd64.tar.gz
+          tar xzvf kustomize_v5.1.1_linux_amd64.tar.gz
+
+
+          cd gitops/
+
+          git config --global --add safe.directory $(pwd)
+
+          git fetch origin
+          git rebase origin/main
+
+          # https://issues.redhat.com/browse/SRVKP-3160
+          IMAGE_URL=$(echo -n \"$(tasks.build.results.IMAGE_URL)\" | sed 's/:main$/\\@$(tasks.build.results.IMAGE_DIGEST)/' | tr -d "\n")
+          $(workspaces.source.path)/kustomize  edit set image $(params.app):latest=${IMAGE_URL}
+
+          git add kustomization.yaml
+          git commit --allow-empty -m \"[OpenShift Pipeline] Update $(params.app):latest deployment to $(tasks.build.results.IMAGE_DIGEST)"
+          git push -v origin HEAD:main
+
+      - name: USER_HOME
+        value: /root
+      - name: VERBOSE
+        value: "true"
+      runAfter:
+      - git-clone-gitops
+      taskRef:
+        kind: ClusterTask
+        name: git-cli
+      workspaces:
+      - name: source
+        workspace: source
+      - name: basic-auth
+        workspace: git-config
+    - name: git-clone-gitops
+      params:
+      - name: url
+        value: >-
+          https://gitea.{APPS}/{USER}/gitops.git
+      - name: revision
+        value: main
+      - name: refspec
+        value: ""
+      - name: submodules
+        value: "true"
+      - name: depth
+        value: "0"
+      - name: sslVerify
+        value: "true"
+      - name: crtFileName
+        value: ca-bundle.crt
+      - name: subdirectory
+        value: gitops
+      - name: sparseCheckoutDirectories
+        value: ""
+      - name: deleteExisting
+        value: "true"
+      - name: httpProxy
+        value: ""
+      - name: httpsProxy
+        value: ""
+      - name: noProxy
+        value: ""
+      - name: verbose
+        value: "true"
+      - name: userHome
+        value: /home/git
+      runAfter:
+      - build
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+      - name: output
+        workspace: source
+      - name: basic-auth
+        workspace: git-config
+
   workspaces:
     - name: source
+    - name: git-config
