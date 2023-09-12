@@ -53,11 +53,11 @@ ArgoCD URL|https://argocd-server-{USER}-gitops.{APPS}
 
 To make our apps managed by Istio Service Mesh, we have to add the corresponding annotation in our Deployment files. Add in the Deployment metadata section of the template for all deployment files:
 
-[source]
-```
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
 annotations:
   sidecar.istio.io/inject: "true"
-```
+----
 
 Sync ArgoCD and the Deployments are recreated. Check the pods - all pods should be running and you should see in the READY column "2/2". Why 2? In the pod are 2 containers - one for the app and one for the Envoy Sidecar. You can also analyze the containers in the pod in the OpenShift Web Console.
 
@@ -68,18 +68,18 @@ Good practice is, to route all traffic to our current version, so future deploym
 When everything is applied and the Gateway is ready, find out the Gateway URL to call our app-a endpoint:
 
 [source,subs="attributes"]
-```
+----
 oc get route istio-ingressgateway -n {USER}-service-mesh-system
 ROUTE=...
 curl $ROUTE/service-a
-```
+----
 
 If the services respond correctly, continue. And now it's a good opportunity, to create some traffic and to explore our Obersability tools, Kiali and Jager. Maybe create a loop to generate some traffic, and have a look at Kiali and Jaeger Distributed Tracing*. You'll find the URLs in OpenShift, Networking.
 
 [source]
-```
+----
 while true; do curl $ROUTE/service-a; sleep 0.5; done
-```
+----
 
 _(*) The Envoy Sidecar automatically injects tracing headers and sends traffic metadata to Kiali and Jaeger. For the Distributed Tracing, you must propagate the tracing headers when doing calls to other services. See https://istio.io/latest/docs/tasks/observability/distributed-tracing/overview/[Istio Header Propagation]._
 
@@ -92,51 +92,52 @@ Let's start by scaling our app-c to 2. You can do that in the Deployment file of
 Start again our loop to call the endpoint auf app-a:
 
 [source,subs="attributes"]
-```
+----
 ROUTE=...
 while true; do curl $ROUTE/service-a; sleep 0.5; done
-```
+----
 
-Open a second terminal 
+Now let's crash app-c. There's a `/crash` endpoint, we just have to find a way to call that route. To do that, we use port-fowarding, so do a port-forward for one of the 2 app-c pods:
 
-In Terminal 2, let's reset the VirtualService from our former Canary release and scale the service-c-v1 down to zero replicas and service-c-v2 up to 2 replicas.
-
-**Terminal 2:**
 [source,subs="attributes"]
-```
-oc replace -f {REPO_PREFIX}-servicemesh/main/circuit-breaker/1-vs.yml
-oc scale deploy/service-c-v1 --replicas 0
-oc scale deploy/service-c-v2 --replicas 2
-```
-
-Now connect to service-c and let it crash... in a separate terminal, run
-
-**Terminal 3:**
-[source,subs="attributes"]
-```
+----
 oc get pod
 POD_NAME=....
 oc port-forward pod/$POD_NAME 8080:8080
-```
+----
 
-Let the port-forwarding of Terminal 3 open, go back to Terminal 2 and let one app of service-c crash: +
-`curl localhost:8080/crash`
+And in a third terminal, call `localhost:8080/crash` and observe the loop - half of the calls crash and the error is propagated to our users.
 
-See what happens in Terminal 1 with the curl loop.
+First step to more resiliency is a Circuit Breaker that kicks in and gives the crashed pod time to recover. The Circuit Breaker is configured in a DestinationRule. Open the file `app-c-dr-vs.yml` in the `servicemesh folder` and add the Circuit Breaker configuration to the spec section of the DestinationRule:
 
-Now apply the Circuit Breaker (check what happens), then the Retry policy.
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        maxConnections: 100
+    outlierDetection:
+      consecutive5xxErrors: 1
+      interval: 2s
+      baseEjectionTime: 10s
+      maxEjectionPercent: 100
+----
 
-**Terminal 2:** +
-[source,subs="attributes"]
-oc replace -f {REPO_PREFIX}-servicemesh/main/circuit-breaker/2-destination-rules.yml
+Better, but still some errors. Let's apply the retry policy. In the same file, add the Retry policy to the VirtualService for the `http` `route`:
 
-Better, but still some errors. Let's apply the retry policy.
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+retries:
+      attempts: 3
+      perTryTimeout: 1s
+      retryOn: 5xx
+----
 
-**Terminal 2:** +
-[source,subs="attributes"]
-oc replace -f {REPO_PREFIX}-servicemesh/main/circuit-breaker/3-vs-retry.yml
+Now all errors are gone.
 
-Finally repair the crashed service.
+Finally, "repair" the crashed pod by calling the repair endpoint:
 
 **Terminal 2:** +
 `curl localhost:8080/repair`
@@ -166,26 +167,22 @@ In the Keycloak admin console:
 2. Create a user "myuser" with first name and last name and set a password 'test' or anything you like better; set "Temporary to "Off"
 3. Create a client "myclient" with client type "OpenID Connect", client authentication "On", authentication flow: Standard flow, Direct access grants
 
-In "Access settings", set the root URL to your Keycloak URL (https://keycloak-keycloak.apps-crc.testing in OpenShift local).
+In "Access settings", set the root URL to your Keycloak URL.
 
 In "Advanced", set "Authentication flow overrides" to  
 * Browser Flow: browser
 * Direct Grant Flow: direct grant
 
-Now call our service-a as before (`curl $ROUTE/service-a`) and then configure Service Mesh to protect the service-a:
+Now call our service-a as before (`curl $ROUTE/service-a`) and then configure Service Mesh to protect the service-a. We've prepared an `auth.yml` file in the `servicemesh` folder. Set the correct URLs in that file and include it in the resource section of `servicemesh/kustomization.yml`.
 
-```bash
-oc create -f {REPO_PREFIX}-servicemesh/main/auth/auth.yml
-```
-
-Call the service-a URL again you should get an "Unauthorized".
+Call the service-a URL again you should get an "Unauthorized". If not, wait 1-2 seconds and try again. It always needs a short amount of time to apply ServiceMesh configuration changes to the sidecars.
 
 ### Login
 
 Get the JWT from Keycloak:
 
-```bash
-curl --insecure -L -X POST 'https://keycloak-keycloak.apps-crc.testing/realms/myrealm/protocol/openid-connect/token' \
+````bash
+curl --insecure -L -X POST 'https://<KEYCLOAK URL>/realms/myrealm/protocol/openid-connect/token' \
 -H 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'client_id=myclient' \
 --data-urlencode 'grant_type=password' \
@@ -193,7 +190,7 @@ curl --insecure -L -X POST 'https://keycloak-keycloak.apps-crc.testing/realms/my
 --data-urlencode 'scope=openid' \
 --data-urlencode 'username=myuser' \
 --data-urlencode 'password=test'
-```
+````
 
 Then try again the service-a with the access token Bearer:
 
