@@ -67,10 +67,9 @@ Good practice is, to route all traffic to our current version, so future deploym
 
 When everything is applied and the Gateway is ready, find out the Gateway URL to call our app-a endpoint:
 
-[source,subs="attributes"]
+[source,bash,subs="attributes"]
 ----
-oc get route istio-ingressgateway -n {USER}-service-mesh-system
-ROUTE=...
+ROUTE=$(oc get route istio-ingressgateway -n {USER}-service-mesh-system --template='{{ .spec.host }}')
 curl $ROUTE/service-a
 ----
 
@@ -152,16 +151,17 @@ We use Keycloak to manage our users. User can login via Keycloak and we configur
 
 Keycloak is already installed, you can find the URL in the OpenShift console or better via terminal:
 
-```bash
-KEYCLOAK_URL=https://$(oc get route keycloak --template='{{ .spec.host }}') &&
+[source,bash,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+KEYCLOAK_URL=https://$(oc get route keycloak  -n {USER}-keycloak --template='{{ .spec.host }}') &&
 echo "" &&
 echo "Keycloak:                 $KEYCLOAK_URL" &&
 echo "Keycloak Admin Console:   $KEYCLOAK_URL/admin" &&
 echo "Keycloak Account Console: $KEYCLOAK_URL/realms/myrealm/account" &&
 echo ""
-```
+----
 
-In the Keycloak admin console:
+Login with admin / admin.
 
 1. Create a realm "myrealm"
 2. Create a user "myuser" with first name and last name and set a password 'test' or anything you like better; set "Temporary to "Off"
@@ -173,16 +173,16 @@ In "Advanced", set "Authentication flow overrides" to
 * Browser Flow: browser
 * Direct Grant Flow: direct grant
 
-Now call our service-a as before (`curl $ROUTE/service-a`) and then configure Service Mesh to protect the service-a. We've prepared an `auth.yml` file in the `servicemesh` folder. Set the correct URLs in that file and include it in the resource section of `servicemesh/kustomization.yml`.
+Now call our service-a as before (`curl $ROUTE/service-a`) and then configure Service Mesh to protect the service-a:
 
-Call the service-a URL again you should get an "Unauthorized". If not, wait 1-2 seconds and try again. It always needs a short amount of time to apply ServiceMesh configuration changes to the sidecars.
+We've prepared an `auth.yml` file in the `servicemesh` folder. Set the correct URLs in that file and include it in the resource section of `servicemesh/kustomization.yml`. Call the service-a URL again you should get an "Unauthorized". If not, wait 1-2 seconds and try again. It always needs a short amount of time to apply ServiceMesh configuration changes to the sidecars.
 
 ### Login
 
 Get the JWT from Keycloak:
 
 ````bash
-curl --insecure -L -X POST 'https://<KEYCLOAK URL>/realms/myrealm/protocol/openid-connect/token' \
+curl --insecure -L -X POST 'https://$KEYCLOAK_URL/realms/myrealm/protocol/openid-connect/token' \
 -H 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'client_id=myclient' \
 --data-urlencode 'grant_type=password' \
