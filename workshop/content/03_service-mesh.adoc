@@ -6,9 +6,6 @@
 :user: %user%
 :password: %password%
 
-//:REPO_PREFIX: https://raw.githubusercontent.com/sa-mw-dach/opentour-2022-servicemesh/main
-:REPO_PREFIX: https://raw.githubusercontent.com/sa-mw-dach/microservice-introduction-
-
 :markup-in-source: verbatim,attributes,quotes
 :source-highlighter: rouge
 
@@ -31,7 +28,6 @@ https://github.com/sa-mw-dach/microservice-introduction-app-c
 
 In the cluster Service Mesh is already installed. You can check it in the dedicated Service Mesh namespace:
 
-//TODO
 [%autowidth]
 |===
 h|Select Project|`{USER}-service-mesh-system`
@@ -41,7 +37,7 @@ Check the operators installed in the Admin perspective, Operators. All Service M
 
 ## Using the Service Mesh
 
-### Deploy the sample apps
+### Add Service Mesh to our apps
 
 First, switch to the apps project:
 [source,subs="attributes"]
@@ -49,78 +45,59 @@ First, switch to the apps project:
 oc project {USER}-apps
 ```
 
-Then apply the deployment files for the apps:
+Open Gitea and select the Gitops project. You'll find Gitea here:  
+Git Repo URL|https://gitea.{APPS}/{USER}/
 
-[source,subs="attributes"]
+Changes in the Git repo will be synced from ArgoCD as before.
+ArgoCD URL|https://argocd-server-{USER}-gitops.{APPS}
+
+To make our apps managed by Istio Service Mesh, we have to add the corresponding annotation in our Deployment files. Add in the Deployment metadata section of the template for all deployment files:
+
+[source]
 ```
-oc create -f {REPO_PREFIX}-servicemesh/main/kubernetes/a-deploy.yml
-oc create -f {REPO_PREFIX}-servicemesh/main/kubernetes/b-deploy.yml
-oc create -f {REPO_PREFIX}-servicemesh/main/kubernetes/c-v1-deploy.yml
-oc create -f {REPO_PREFIX}-servicemesh/main/kubernetes/c-v2-deploy.yml
+annotations:
+  sidecar.istio.io/inject: "true"
 ```
 
-Check the pods - all pods should be running and you should see in the READY column "2/2". Why 2? In the pod are 2 containers - one for the app and one for the Envoy Sidecar.
+Sync ArgoCD and the Deployments are recreated. Check the pods - all pods should be running and you should see in the READY column "2/2". Why 2? In the pod are 2 containers - one for the app and one for the Envoy Sidecar. You can also analyze the containers in the pod in the OpenShift Web Console.
 
 ### Create a Gateway for Ingress
 
-Now we create a Gateway and expose our service-a.
+Good practice is, to route all traffic to our current version, so future deployments of new versions don't get traffic by accident. For that we've provided DestinationRules and VirtualServices for all our apps. You'll find these in the `servicemesh` folder, together with a Gateway file. Gateway exposes our app-a via Istio Ingress Gateway. To apply these files, add the `servicemesh` folder to `kustomization.yml` and let ArgoCD sync.
+
+When everything is applied and the Gateway is ready, find out the Gateway URL to call our app-a endpoint:
 
 [source,subs="attributes"]
 ```
-oc create -f {REPO_PREFIX}-servicemesh/main/kubernetes/gateway.yml
-oc get route istio-ingressgateway -n istio-system
+oc get route istio-ingressgateway -n {USER}-service-mesh-system
 ROUTE=...
 curl $ROUTE/service-a
 ```
 
-If the services respond correctly, continue.
+If the services respond correctly, continue. And now it's a good opportunity, to create some traffic and to explore our Obersability tools, Kiali and Jager. Maybe create a loop to generate some traffic, and have a look at Kiali and Jaeger Distributed Tracing*. You'll find the URLs in OpenShift, Networking.
 
-## Canary Releases
-
-Traffic shaping allows us to release new software versions as "Canary releases" to **avoid the risk of a Big Bang / All at Once approach**. This is the first use case we'll have a look at.
-
-We already have two versions of service-c deployed. At the moment the traffic goes 50%/50%, the default "round robin" behavior of service routing in Kubernetes.
-
-With a Service Mesh, we can finetune this behavior. First we inform the Service Mesh about our two versions, using a _DestinationRule_: +
-[source,subs="attributes"]
-oc create -f {REPO_PREFIX}-servicemesh/main/destination-rules.yml
-
-Then we can start to shift the traffic. Open 2 terminals. 
-
-**Terminal 1:**
-[source,subs="attributes"]
+[source]
 ```
-ROUTE=...
 while true; do curl $ROUTE/service-a; sleep 0.5; done
 ```
-
-**Terminal 2:**
-
-1. 100% traffic goes to our "old" version 1 +
-[source,subs="attributes"]
-oc create -f {REPO_PREFIX}-servicemesh/main/canary/1-vs-v1.yml
-2. We start the canary release by sending 10% of traffic to version 2 +
-[source,subs="attributes"]
-oc replace -f {REPO_PREFIX}-servicemesh/main/canary/2-vs-v1_and_v2_90_10.yml
-3. We are happy with version 2 and increase the traffic to 50% +
-[source,subs="attributes"]
-oc replace -f {REPO_PREFIX}-servicemesh/main/canary/3-vs-v1_and_v2_50_50.yml
-4. Finally we send 100% of the traffic to version 2 +
-[source,subs="attributes"]
-oc replace -f {REPO_PREFIX}-servicemesh/main/canary/4-vs-v2.yml
-
-While applying steps 1-4, check Kiali and Jaeger. Here you have great Observability without any libraries or coding*. You can open Jaeger and Kiali from the OpenShift Console (Networing Routes).
 
 _(*) The Envoy Sidecar automatically injects tracing headers and sends traffic metadata to Kiali and Jaeger. For the Distributed Tracing, you must propagate the tracing headers when doing calls to other services. See https://istio.io/latest/docs/tasks/observability/distributed-tracing/overview/[Istio Header Propagation]._
 
+Now as we have our apps running in a Service Mesh and our Observability tools seem to be working, let's add some resiliency to our service landscape to avoid cascading failures and the propagation of errors to our end users.
+
 ### Circuit Breaker and Retry
 
-**Terminal 1:**
+Let's start by scaling our app-c to 2. You can do that in the Deployment file of app-c in Gitea.
+
+Start again our loop to call the endpoint auf app-a:
+
 [source,subs="attributes"]
 ```
 ROUTE=...
 while true; do curl $ROUTE/service-a; sleep 0.5; done
 ```
+
+Open a second terminal 
 
 In Terminal 2, let's reset the VirtualService from our former Canary release and scale the service-c-v1 down to zero replicas and service-c-v2 up to 2 replicas.
 
