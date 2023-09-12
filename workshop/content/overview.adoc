@@ -23,11 +23,13 @@ h|Username|`{USER}`
 h|Password|`{PASSWORD}`
 |===
 
-3. Select project/namespace: `{USER}-dev`
+3. Click "Skip Tour"
 
-4. Click `>_` Icon on the top right corner
+4. Select project/namespace: `{USER}-dev`
 
-5. Click Start to start your Web Terminal
+5. Click `>_` Icon on the top right corner
+
+6. Click Start to start your Web Terminal
 
 
 video::overview-assets/terminal.mp4[width=1024]
