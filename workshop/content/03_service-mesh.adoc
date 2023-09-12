@@ -100,9 +100,9 @@ Now let's crash app-c. There's a `/crash` endpoint, we just have to find a way t
 
 [source,subs="attributes"]
 ----
-oc get pod
+oc get pod -n {USER}-apps
 POD_NAME=....
-oc port-forward pod/$POD_NAME 8080:8080
+oc port-forward pod/$POD_NAME -n {USER}-apps 8080:8080
 ----
 
 And in a third terminal, call `localhost:8080/crash` and observe the loop - half of the calls crash and the error is propagated to our users.
@@ -112,16 +112,17 @@ First step to more resiliency is a Circuit Breaker that kicks in and gives the c
 [source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
 trafficPolicy:
-    connectionPool:
-      tcp:
-        maxConnections: 100
-      http:
-        maxConnections: 100
-    outlierDetection:
-      consecutive5xxErrors: 1
-      interval: 2s
-      baseEjectionTime: 10s
-      maxEjectionPercent: 100
+  connectionPool:
+    tcp:
+      maxConnections: 100
+    http:
+      http2MaxRequests: 1000
+      maxRequestsPerConnection: 10
+  outlierDetection:
+    baseEjectionTime: 10s
+    consecutive5xxErrors: 1
+    interval: 2s
+    maxEjectionPercent: 100
 ----
 
 Better, but still some errors. Let's apply the retry policy. In the same file, add the Retry policy to the VirtualService for the `http` `route`:
@@ -129,9 +130,9 @@ Better, but still some errors. Let's apply the retry policy. In the same file, a
 [source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
 retries:
-      attempts: 3
-      perTryTimeout: 1s
-      retryOn: 5xx
+  attempts: 3
+  perTryTimeout: 1s
+  retryOn: 5xx
 ----
 
 Now all errors are gone.
