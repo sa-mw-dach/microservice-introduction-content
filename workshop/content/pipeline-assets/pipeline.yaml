@@ -78,7 +78,7 @@ spec:
       - name: source
         workspace: source
       - name: basic-auth
-        workspace: git-config
+        workspace: git-basic-auth
     - name: git-clone-gitops
       params:
       - name: url
@@ -121,8 +121,8 @@ spec:
       - name: output
         workspace: source
       - name: basic-auth
-        workspace: git-config
+        workspace: git-basic-auth
 
   workspaces:
     - name: source
-    - name: git-config
+    - name: git-basic-auth

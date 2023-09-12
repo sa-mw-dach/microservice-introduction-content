@@ -332,9 +332,9 @@ video::pipeline-assets/start-pipeline-cli.mp4[width=1024]
 
 ====
 
+=== Create pipeline trigger
 
-=== TODO Create pipeline trigger
-
+video::pipeline-assets/create-pipeline-trigger.mp4[width=1024]
 
 .*YAML*
 [%collapsible]
@@ -345,38 +345,21 @@ include::content/pipeline-assets/pipeline-trigger.yaml[]
 ----
 ====
 
-=== TODO Configure pipeline trigger at Git
+=== Configure pipeline trigger at Git
 
 
-Configure Gitea to "hit" the trigger: https://gitea.{APPS}/{USER}/hello/settings/hooks
+Configure Gitea to "hit" the trigger at
 
-[%autowidth]
-|===
-h|Trigger URL|http://pipeline-trigger-{USER}-hello-dev.{APPS}
-|===
-
-image:pipeline-assets/gitea-trigger.mkv.gif[]
-
-===== TODO Change Application code
-
-Open three tabs:
+ * app-a: https://gitea.{APPS}/{USER}/app-a/settings/hooks
+ * app-b: https://gitea.{APPS}/{USER}/app-b/settings/hooks
+ * app-c: https://gitea.{APPS}/{USER}/app-c/settings/hooks
 
 [%autowidth]
 |===
-h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
-h|OpenShift Web Console|https://console-openshift-console.{APPS}/topology/ns/{USER}-hello-dev?view=graph
-h|Application|https://hello-{USER}-hello-dev.{APPS}
+h|User|{USER}
+h|Password|{PASSWORD}
+h|Trigger URL|https://build-app-trigger-{USER}-dev.{APPS}
 |===
 
-Change file `hello/src/main/java/com/redhat/opentour/HelloController.java` in Gitea and watch the pipeline is running & deployed in dev.
+video::pipeline-assets/trigger-git.mp4[width=1024]
 
-Line 12 from:
-[source,jav,subs="attributes"]
--------
-ctx.result(format("Hello world from %s!", LOCATION));
--------
-Into
-[source,java,subs="attributes"]
--------
-ctx.result(format("Hello OpenTour from %s!", LOCATION));
--------

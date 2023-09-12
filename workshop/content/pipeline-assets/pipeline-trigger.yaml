@@ -39,6 +39,9 @@ spec:
         serviceAccountName: pipeline
         timeout: 1h0m0s
         workspaces:
+          - name: git-basic-auth
+            secret:
+              secretName: git-basic-auth
           - name: source
             volumeClaimTemplate:
               spec:
