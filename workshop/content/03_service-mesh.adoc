@@ -182,7 +182,7 @@ We've prepared an `auth.yml` file in the `servicemesh` folder. Set the correct U
 Get the JWT from Keycloak (replace <clientsecret> with the secret you find in Keycloak for your client, tab "Credentials"):
 
 ```bash
-CLIENT_SECRET=<clientsecret>
+CLIENT_SECRET=...
 
 curl --insecure -L -X POST "$KEYCLOAK_URL/realms/myrealm/protocol/openid-connect/token" \
 -H "Content-Type: application/x-www-form-urlencoded" \
