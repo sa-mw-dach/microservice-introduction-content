@@ -18,7 +18,59 @@ https://console-openshift-console.{APPS}/topology/ns/{USER}-dev?view=graph
 h|Select Project|`{USER}-dev`
 |===
 
+=== Create secret with push credentials
+
+**Note**: It is strongly advised that you use ssh credentials when the option is available to you before using basic auth.
+
+
+ * Select "Secrets" in the Menu
+ * Click "Create" -> "Key/Value Secret"
+ * Fill out the form
+ ** Secret name:
++
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+git-basic-auth
+----
+
+ ** Key:
++
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+.git-credentials
+----
+
+
+ ** Value:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+https://{USER}:cds%232023@gitea.{APPS}
+----
+
+ * Click "Add key/value"
+ * Fill out the form
+ ** Key:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+.gitconfig
+----
+
+ ** Value:
++
+[source,ini,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+[credential "https://gitea.{APPS}"]
+  helper = store
+----
+
+
+
+
 === Create a pipeline
+
+
 
 2tln * Create git-basic-auth secret
 
