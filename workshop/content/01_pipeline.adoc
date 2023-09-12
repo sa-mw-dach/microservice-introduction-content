@@ -65,25 +65,209 @@ https://{USER}:cds%232023@gitea.{APPS}
   helper = store
 ----
 
-
-
+video::pipeline-assets/secret.mp4[width=1024]
 
 === Create a pipeline
 
+ * Click Pipelines
+ * Click "Create" -> "Pipeline"
+ * Fill out the form
+ ** Name:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+build-app
+----
+
+ * In Parameters section, click : "Add parameter"
+ * Fill out the form
+ ** Name:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+app
+----
+ ** Description:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+Application name app-a, app-b, app-c
+----
+ ** Default value:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+app-a
+----
 
 
-2tln * Create git-basic-auth secret
+ * In Workspaces section, click : "Add workspace"
+ * Fill out the form
+ ** Name:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+source
+----
 
- * Create pipeline
- * Pipeline name: build-app
- * Add parameter application
- * Add Workspace source
- * Add git-clone
- * Add buildah task
- * Add -> Import from Git
+ * In Workspaces section, click : "Add workspace"
+ * Fill out the form
+ ** Name:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+git-basic-auth
+----
 
-ToDo: Create Video
+==== Add Tasks to Pipeline
+.*Task: git-clone-source*
+[%collapsible]
+====
+ * In Tasks section, click : "Add task"
+ * Search and select for "git-clone" from Red Hat
+ * Click "Add"
+ * Click on "git-clone"
+ * Fill out the form
+ ** Display name:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+git-clone-source
+----
+ ** URL:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+https://gitea.{APPS}/{USER}/$(params.app).git
+----
+** Workspaces, output: Select `source`
+====
 
+.*Task: build*
+[%collapsible]
+====
+ * Move the mouse over "git-clone-source", click the blue plus (+) on the right
+ * Click "Add Task"
+ * Search and select for "buildah" from Red Hat
+ * Click "Add"
+ * Click on "buildah"
+ * Fill out the form
+ ** Display name:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+build
+----
+ ** IMAGE:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+image-registry.openshift-image-registry.svc:5000/{USER}-apps/$(params.app):main
+----
+ ** DOCKERFILE:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+./Containerfile
+----
+** Workspaces, source: Select `source`
+====
+
+.*Task: git-clone-gitops*
+[%collapsible]
+====
+* Move the mouse over "build", click the blue plus (+) on the right
+ * Click "Add Task"
+ * Search and select for "git-clone" from Red Hat
+ * Click "Add"
+ * Click on "git-clone"
+ * Fill out the form
+ ** Display name:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+git-clone-gitops
+----
+ ** url:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+https://gitea.{APPS}/{USER}/gitops.git
+----
+ ** revision:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+main
+----
+ ** depth:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+0
+----
+ ** subdirectory:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+gitops
+----
+** Workspaces, output: Select `source`
+====
+
+.*Task: git-cli*
+[%collapsible]
+====
+* Move the mouse over "git-clone-gitops", click the blue plus (+) on the right
+ * Click "Add Task"
+ * Search and select for "git-cli" from Red Hat
+ * Click "Add"
+ * Click on "git-cli"
+ * Fill out the form
+ ** Display name:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+update-deployment
+----
+ ** GIT_USER_NAME:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+Pipeline Bot
+----
+ ** GIT_USER_EMAIL:
++
+[source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+bot@example.com
+----
+
+ ** GIT_SCRIPT:
++
+[source,bash,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+  cd $(workspaces.source.path)
+  wget  https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.1.1/kustomize_v5.1.1_linux_amd64.tar.gz
+  tar xzvf kustomize_v5.1.1_linux_amd64.tar.gz
+  cd gitops/
+  git config --global --add safe.directory $(pwd)
+  git fetch origin
+  git rebase origin/main
+  # https://issues.redhat.com/browse/SRVKP-3160
+  IMAGE_URL=$(echo -n "$(tasks.build.results.IMAGE_URL)" | sed 's/:main$/\@$(tasks.build.results.IMAGE_DIGEST)/' | tr -d "\n")
+  $(workspaces.source.path)/kustomize  edit set image $(params.app):latest=${IMAGE_URL}
+  git add kustomization.yaml
+  git commit --allow-empty -m "[OpenShift Pipeline] Update $(params.app):latest deployment to $(tasks.build.results.IMAGE_DIGEST)"
+  git push -v origin HEAD:main
+----
+** Workspaces, source: Select `source`
+** Workspaces, basic-auth: Select `git-basic-auth`
+====
+
+ * Click "Create" at the bottom
+
+video::pipeline-assets/create.mp4[width=1024]
 
 .*Solution*
 [%collapsible]
@@ -91,7 +275,7 @@ ToDo: Create Video
 
 Copy&paste the solution into the Web UI:
 
-ToDo: Add Provide Video
+video::pipeline-assets/create-yaml.mp4[width=1024]
 
 [source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
@@ -100,15 +284,36 @@ include::content/pipeline-assets/pipeline.yaml[]
 
 ====
 
+=== Start pipeline for Application - via WebUI OR CLI
 
+.*via WebUI*
+[%collapsible]
+====
 
-=== Start pipeline for Application
+repeat this for every `app-a`, `app-b`, `app-c`
 
-==== Via WebUI
+ * On the Pipeline detail page after creation, click "Actions" -> Start
+ * Fill out the form
+ ** app: Type onetime `app-a`, next time `app-b` and last time `app-c`
+ ** source: Select `VolumeClaimTemplate`
+ ** git-basic-auth: Select `Sectet`,
+ ** Secret: Select `git-basic-auth`,
+ * Click "Start"
 
-==== Via CLI
+And repeat with the next app.
 
-```
+video::pipeline-assets/start-pipeline-webui.mp4[width=1024]
+
+====
+
+.*via CLI*
+[%collapsible]
+====
+
+Open the Web Terminal via `>_`
+
+[source,bash,options="nowrap",subs="attributes,{markup-in-source}"]
+----
 cat - > claim-template.yaml <<EOF
 spec:
   accessModes:
@@ -117,14 +322,18 @@ spec:
     requests:
       storage: 1Gi
 EOF
-tkn pipeline start build-app -p app=app-a -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-config,secret=git-basic-auth
-tkn pipeline start build-app -p app=app-b -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-config,secret=git-basic-auth
-tkn pipeline start build-app -p app=app-c -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-config,secret=git-basic-auth
+tkn pipeline start build-app -p app=app-a -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-basic-auth,secret=git-basic-auth
+tkn pipeline start build-app -p app=app-b -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-basic-auth,secret=git-basic-auth
+tkn pipeline start build-app -p app=app-c -w name=source,volumeClaimTemplateFile=claim-template.yaml -w name=git-basic-auth,secret=git-basic-auth
 
-```
+----
+
+video::pipeline-assets/start-pipeline-cli.mp4[width=1024]
+
+====
 
 
-=== Configure Trigger
+=== TODO Create pipeline trigger
 
 
 .*YAML*
@@ -136,152 +345,7 @@ include::content/pipeline-assets/pipeline-trigger.yaml[]
 ----
 ====
 
-
-
-++++
-<br/><br/><br/><br/>
-<hr/>
-<h1>OLD /  Backup</h1>
-++++
-
-
-[%autowidth]
-|===
-2+h|Git
-h|Git Repo URL|https://gitea.{APPS}/{USER}/hello.git
-h|Import Strategy| Select "Builder Image"
-h|Builder Image| Select "Java"
-
-2+h|General
-h|Application name|hello
-h|Name|hello
-2+h|Pipelines
-h|Add pipeline|Select checkbox
-|===
-
-image:pipeline-assets/create-pipeline.mkv.gif[Screenshot: GitOps Login]
-
-
-=== Add Gitea Build Trigger
-
-Open OpenShift Web Console https://console-openshift-console.{APPS}
-
-Deploy YAML via OpenShift Web Console:
-
-[source,yaml,subs="attributes"]
--------
-apiVersion: triggers.tekton.dev/v1beta1
-kind: TriggerTemplate
-metadata:
-  name: hello-dev-pipeline-trigger-template
-  annotations:
-    triggers.tekton.dev/old-escape-quotes: 'true'
-spec:
-  params:
-    - name: repo
-      description: The Git repo name
-    - name: branch
-      description: The Git repo branch name
-    - name: hook-type
-      description: The Webhook type - branch or tag
-    - name: username
-      description: The user that created the branch
-  resourcetemplates:
-    - apiVersion: tekton.dev/v1beta1
-      kind: PipelineRun
-      metadata:
-        generateName: hello-
-        labels:
-          app.kubernetes.io/instance: hello
-          app.kubernetes.io/name: hello
-          pipeline.openshift.io/runtime: java
-          pipeline.openshift.io/runtime-version: openjdk-17-ubi8
-          pipeline.openshift.io/type: kubernetes
-          tekton.dev/pipeline: hello
-      spec:
-        params:
-          - name: APP_NAME
-            value: hello
-          - name: GIT_REPO
-            value: $(tt.params.repo)
-          - name: GIT_REVISION
-            value: $(tt.params.branch)
-          - name: PATH_CONTEXT
-            value: .
-          - name: VERSION
-            value: openjdk-17-ubi8
-        pipelineRef:
-          name: hello
-        serviceAccountName: pipeline
-        timeout: 1h0m0s
-        workspaces:
-          - name: workspace
-            volumeClaimTemplate:
-              metadata:
-                creationTimestamp: null
-                labels:
-                  tekton.dev/pipeline: hello
-              spec:
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 1Gi
-
----
-apiVersion: triggers.tekton.dev/v1beta1
-kind: TriggerBinding
-metadata:
-  name: hello-dev-pipeline-trigger-binding
-spec:
-  params:
-    - name: repo
-      value: "$(body.repository.clone_url)"
-    - name: branch
-      value: "$(body.ref)"
-    - name: hook-type
-      value: "$(header.X-Gitea-Event)"
-    - name: username
-      value: "$(body.sender.username)"
----
-apiVersion: triggers.tekton.dev/v1beta1
-kind: Trigger
-metadata:
-  name: hello-dev-pipeline-trigger
-spec:
-  interceptors: []
-  bindings:
-  - ref: hello-dev-pipeline-trigger-binding
-  template:
-    ref: hello-dev-pipeline-trigger-template
----
-apiVersion: triggers.tekton.dev/v1beta1
-kind: EventListener
-metadata:
-  name: hello-dev-pipeline-trigger-listener
-spec:
-  serviceAccountName: pipeline
-  triggers:
-  - triggerRef: hello-dev-pipeline-trigger
-
----
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  name: pipeline-trigger
-spec:
-  port:
-    targetPort: http-listener
-  to:
-    kind: Service
-    name: el-hello-dev-pipeline-trigger-listener
-    weight: 100
-  wildcardPolicy: None
-
--------
-
-image:pipeline-assets/build-trigger.mkv.gif[]
-
+=== TODO Configure pipeline trigger at Git
 
 
 Configure Gitea to "hit" the trigger: https://gitea.{APPS}/{USER}/hello/settings/hooks
@@ -293,7 +357,7 @@ h|Trigger URL|http://pipeline-trigger-{USER}-hello-dev.{APPS}
 
 image:pipeline-assets/gitea-trigger.mkv.gif[]
 
-===== Change Application code
+===== TODO Change Application code
 
 Open three tabs:
 
@@ -316,51 +380,3 @@ Into
 -------
 ctx.result(format("Hello OpenTour from %s!", LOCATION));
 -------
-
-image:pipeline-assets/app-change.mkv.gif[]
-
-===== Populate into production
-
-Open OpenShift Web console https://console-openshift-console.{APPS}/topology/ns/{USER}-hello-dev?view=graph
-
-
-Let's create an populate pipeline by hand.
-
-[%autowidth]
-|===
-h|srcImageURL|`docker://image-registry.openshift-image-registry.svc:5000/{USER}-hello-dev/hello:latest`
-h|destImageURL|`docker://image-registry.openshift-image-registry.svc:5000/{USER}-hello-main/hello:$(params.VERSION)`
-|===
-
-image:pipeline-assets/populate.mkv.gif[]
-
-
-===== Change application image in production
-
-Open four tabs:
-
-[%autowidth]
-|===
-h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
-h|OpenShift GitOps|https://argocd-server-{USER}-gitops.{APPS}
-h|Production Application|https://opentour-2022-hello-{USER}-hello-main.{APPS}
-h|OpenShift Web console|https://console-openshift-console.{APPS}/topology/ns/{USER}-hello-dev?view=graph
-
-|===
-
-
-Change file `hello-gitops/deploy/deployment.yaml` in Gitea and watch the pipeline is running & deployed in dev.
-
-Line 26 from:
-[source,jav,subs="attributes"]
--------
-image: quay.io/sa-mw-dach/opentour-2022-hello:main
--------
-Into
-[source,java,subs="attributes"]
--------
-image: image-registry.openshift-image-registry.svc:5000/{USER}-hello-main/hello:v01
--------
-
-image:pipeline-assets/change-production-image.mkv.gif[]
-

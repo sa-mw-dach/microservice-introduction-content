@@ -8,7 +8,6 @@
 
 == Simple GitOps Application Deployment
 
-
 ===== Open OpenShift GitOps:
 
 https://argocd-server-{USER}-gitops.{APPS}
@@ -20,8 +19,7 @@ h|Username|`{USER}`
 h|Password|`{PASSWORD}`
 |===
 
-image:gitops-assets/argo-login.mkv.gif[]
-
+video::gitops-assets/argo-login.mp4[width=1024]
 
 ===== Create GitOps Application
 
@@ -49,69 +47,14 @@ h|*Cluster URL*|`https://kubernetes.default.svc`
 h|*Namespace*|`{USER}-apps`
 |===
 
-image:gitops-assets/argo-create-app.mkv.gif[]
-
-==== Fix image
-
-Added to `kustomization.yaml`
-
-[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
-----
-# Testing:
-#   kustomize edit set image app-a:latest=image-registry.openshift-image-registry.svc:5000/{USER}-apps/app-a:main
-#
-images:
-- name: app-a:latest
-  newName: image-registry.openshift-image-registry.svc:5000/{USER}-apps/app-a
-  newTag: main
-- name: app-b:latest
-  newName: image-registry.openshift-image-registry.svc:5000/{USER}-apps/app-b
-  newTag: main
-- name: app-c:latest
-  newName: image-registry.openshift-image-registry.svc:5000/{USER}-apps/app-c
-  newTag: main
-
-----
-
-
-==== Update Pipeline with update
-
-++++
-<br/><br/><br/><br/>
-<hr/>
-<h1>OLD /  Backup</h1>
-++++
-
-
+video::gitops-assets/argo-create-app.mp4[width=1024]
 
 
 ===== Open OpenShift Console & Application URL
 
-https://console-openshift-console.{APPS}
+https://console-openshift-console.{APPS}/topology/ns/{USER}-apps?view=graph
 
-image:gitops-assets/webui-app.mkv.gif[]
+video::gitops-assets/discover-openshift-webui.mp4[width=1024]
 
-
-Application URL: https://opentour-2022-hello-{USER}-hello-main.{APPS}
-
-===== Change application & Sync
-
-Open three tabs:
-
-[%autowidth]
-|===
-h|Gitea|https://gitea.{APPS}/{USER}/hello-gitops/src/branch/main/deploy/deployment.yaml
-h|OpenShift GitOps|https://argocd-server-{USER}-gitops.{APPS}
-h|Application|https://opentour-2022-hello-{USER}-hello-main.{APPS}
-|===
-
-And change in `deployment.yaml`:
-[source,yaml,linenums]
-```
-          env:
-            - name: LOCATION
-              value: City
-```
-
-image:gitops-assets/change-location.mkv.gif[]
+Application URL: https://https://app-a-{USER}-apps.{APPS}
 

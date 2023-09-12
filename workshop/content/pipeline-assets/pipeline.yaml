@@ -10,7 +10,7 @@ spec:
       name: app
       type: string
   tasks:
-    - name: git-clone
+    - name: git-clone-source
       params:
         - name: url
           value: >-
@@ -21,7 +21,7 @@ spec:
       workspaces:
         - name: output
           workspace: source
-    - name: buildah
+    - name: build
       params:
         - name: IMAGE
           value: >-
@@ -29,7 +29,7 @@ spec:
         - name: DOCKERFILE
           value: ./Containerfile
       runAfter:
-        - git-clone
+        - git-clone-source
       taskRef:
         kind: ClusterTask
         name: buildah
@@ -58,11 +58,11 @@ spec:
           git rebase origin/main
 
           # https://issues.redhat.com/browse/SRVKP-3160
-          IMAGE_URL=$(echo -n \"$(tasks.build.results.IMAGE_URL)\" | sed 's/:main$/\\@$(tasks.build.results.IMAGE_DIGEST)/' | tr -d "\n")
+          IMAGE_URL=$(echo -n "$(tasks.build.results.IMAGE_URL)" | sed 's/:main$/\@$(tasks.build.results.IMAGE_DIGEST)/' | tr -d "\n")
           $(workspaces.source.path)/kustomize  edit set image $(params.app):latest=${IMAGE_URL}
 
           git add kustomization.yaml
-          git commit --allow-empty -m \"[OpenShift Pipeline] Update $(params.app):latest deployment to $(tasks.build.results.IMAGE_DIGEST)"
+          git commit --allow-empty -m "[OpenShift Pipeline] Update $(params.app):latest deployment to $(tasks.build.results.IMAGE_DIGEST)"
           git push -v origin HEAD:main
 
       - name: USER_HOME
