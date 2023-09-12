@@ -153,7 +153,7 @@ Keycloak is already installed, you can find the URL in the OpenShift console or 
 
 [source,bash,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
-KEYCLOAK_URL=https://$(oc get route keycloak  -n {USER}-keycloak --template='{{ .spec.host }}') &&
+KEYCLOAK_URL=https://$(oc get route keycloak -n {USER}-keycloak --template='{{ .spec.host }}') &&
 echo "" &&
 echo "Keycloak:                 $KEYCLOAK_URL" &&
 echo "Keycloak Admin Console:   $KEYCLOAK_URL/admin" &&
@@ -169,7 +169,7 @@ Login with admin / admin.
 
 In "Access settings", set the root URL to your Keycloak URL.
 
-In "Advanced", set "Authentication flow overrides" to  
+In tab "Advanced", set "Authentication flow overrides" to  
 * Browser Flow: browser
 * Direct Grant Flow: direct grant
 
@@ -179,23 +179,39 @@ We've prepared an `auth.yml` file in the `servicemesh` folder. Set the correct U
 
 ### Login
 
-Get the JWT from Keycloak:
+Get the JWT from Keycloak (replace <clientsecret> with the secret you find in Keycloak for your client, tab "Credentials"):
 
-````bash
-curl --insecure -L -X POST 'https://$KEYCLOAK_URL/realms/myrealm/protocol/openid-connect/token' \
--H 'Content-Type: application/x-www-form-urlencoded' \
---data-urlencode 'client_id=myclient' \
---data-urlencode 'grant_type=password' \
---data-urlencode 'client_secret=<clientsecret>' \
---data-urlencode 'scope=openid' \
---data-urlencode 'username=myuser' \
---data-urlencode 'password=test'
-````
+```bash
+CLIENT_SECRET=<clientsecret>
+
+curl --insecure -L -X POST "$KEYCLOAK_URL/realms/myrealm/protocol/openid-connect/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "client_id=myclient" \
+--data-urlencode "grant_type=password" \
+--data-urlencode "client_secret=$CLIENT_SECRET" \
+--data-urlencode "scope=openid" \
+--data-urlencode "username=myuser" \
+--data-urlencode "password=test" | jq -r '.access_token'
+```
+
+You can use *jq* to parse the JSON response and read only the access token:
+
+```bash
+TOKEN=$(curl --insecure -L -X POST "$KEYCLOAK_URL/realms/myrealm/protocol/openid-connect/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "client_id=myclient" \
+--data-urlencode "grant_type=password" \
+--data-urlencode "client_secret=$CLIENT_SECRET" \
+--data-urlencode "scope=openid" \
+--data-urlencode "username=myuser" \
+--data-urlencode "password=test" | jq -r '.access_token')
+```
+
 
 Then try again the service-a with the access token Bearer:
 
 ```bash
-curl -H "Authorization: Bearer <token>" $ROUTE/service-a
+curl -H "Authorization: Bearer $TOKEN" $ROUTE/service-a
 ```
 
 Now the request is routed to the backend service. Congratulations, authentication and authorization via Keycloak and Service Mesh is done!
