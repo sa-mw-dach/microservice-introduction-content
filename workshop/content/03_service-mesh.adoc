@@ -45,11 +45,11 @@ First, switch to the apps project:
 oc project {USER}-apps
 ```
 
-Open Gitea and select the Gitops project. You'll find Gitea here:  
-Git Repo URL|https://gitea.{APPS}/{USER}/
+Open Gitea and select the Gitops project. You'll find Gitea here:
+Git Repo URL https://gitea.{APPS}/{USER}/gitops
 
 Changes in the Git repo will be synced from ArgoCD as before.
-ArgoCD URL|https://argocd-server-{USER}-gitops.{APPS}
+ArgoCD URL https://argocd-server-{USER}-gitops.{APPS}
 
 To make our apps managed by Istio Service Mesh, we have to add the corresponding annotation in our Deployment files. Add in the Deployment metadata section of the template for all deployment files:
 
@@ -152,15 +152,14 @@ We use Keycloak to manage our users. User can login via Keycloak and we configur
 
 Keycloak is already installed, you can find the URL in the OpenShift console or better via terminal:
 
-[source,bash,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
-----
-KEYCLOAK_URL=https://$(oc get route keycloak -n {USER}-keycloak --template='{{ .spec.host }}') &&
-echo "" &&
-echo "Keycloak:                 $KEYCLOAK_URL" &&
-echo "Keycloak Admin Console:   $KEYCLOAK_URL/admin" &&
-echo "Keycloak Account Console: $KEYCLOAK_URL/realms/myrealm/account" &&
-echo ""
-----
+
+[%autowidth]
+|===
+|Keycloak|https://keycloak-{USER}-keycloak.{APPS}
+|Keycloak Admin Console|https://keycloak-{USER}-keycloak.{APPS}/admin
+|Keycloak Account Console|https://keycloak-{USER}-keycloak.{APPS}/realms/myrealm/account
+|Internal Keycloak Service|keycloak.{USER}-keycloak.svc.cluster.local
+|===
 
 Login with admin / admin.
 
@@ -170,7 +169,7 @@ Login with admin / admin.
 
 In "Access settings", set the root URL to your Keycloak URL.
 
-In tab "Advanced", set "Authentication flow overrides" to  
+In tab "Advanced", set "Authentication flow overrides" to
 * Browser Flow: browser
 * Direct Grant Flow: direct grant
 
@@ -182,23 +181,26 @@ We've prepared an `auth.yml` file in the `servicemesh` folder. Set the correct U
 
 Get the JWT from Keycloak (replace <clientsecret> with the secret you find in Keycloak for your client, tab "Credentials"):
 
-```bash
+
+[source,bash,options="nowrap",subs="attributes,{markup-in-source}"]
+----
 CLIENT_SECRET=...
 
-curl --insecure -L -X POST "$KEYCLOAK_URL/realms/myrealm/protocol/openid-connect/token" \
+curl --insecure -L -X POST "https://keycloak-{USER}-keycloak.{APPS}/realms/myrealm/protocol/openid-connect/token" \
 -H "Content-Type: application/x-www-form-urlencoded" \
 --data-urlencode "client_id=myclient" \
 --data-urlencode "grant_type=password" \
 --data-urlencode "client_secret=$CLIENT_SECRET" \
 --data-urlencode "scope=openid" \
 --data-urlencode "username=myuser" \
---data-urlencode "password=test" | jq -r '.access_token'
-```
+--data-urlencode "password=test"
+----
 
 You can use *jq* to parse the JSON response and read only the access token:
 
-```bash
-TOKEN=$(curl --insecure -L -X POST "$KEYCLOAK_URL/realms/myrealm/protocol/openid-connect/token" \
+[source,bash,options="nowrap",subs="attributes,{markup-in-source}"]
+----
+TOKEN=$(curl --insecure -L -X POST "https://keycloak-{USER}-keycloak.{APPS}/realms/myrealm/protocol/openid-connect/token" \
 -H "Content-Type: application/x-www-form-urlencoded" \
 --data-urlencode "client_id=myclient" \
 --data-urlencode "grant_type=password" \
@@ -206,7 +208,7 @@ TOKEN=$(curl --insecure -L -X POST "$KEYCLOAK_URL/realms/myrealm/protocol/openid
 --data-urlencode "scope=openid" \
 --data-urlencode "username=myuser" \
 --data-urlencode "password=test" | jq -r '.access_token')
-```
+----
 
 
 Then try again the service-a with the access token Bearer:
