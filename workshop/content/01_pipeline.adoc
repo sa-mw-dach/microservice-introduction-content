@@ -307,30 +307,9 @@ video::pipeline-assets/create.mp4[width=1024]
 ====
 
 
-=== Start pipeline for Application - via WebUI OR CLI
+=== Start pipeline for Application
 
-.*via WebUI*
-[%collapsible]
-====
-
-repeat this for every `app-a`, `app-b`, `app-c`
-
- * On the Pipeline detail page after creation, click "Actions" -> Start
- * Fill out the form
- ** app: Type onetime `app-a`, next time `app-b` and last time `app-c`
- ** source: Select `VolumeClaimTemplate`
- ** git-basic-auth: Select `Sectet`,
- ** Secret: Select `git-basic-auth`,
- * Click "Start"
-
-And repeat with the next app.
-
-video::pipeline-assets/start-pipeline-webui.mp4[width=1024]
-
-====
-
-.*via CLI*
-[%collapsible]
+*via CLI*
 ====
 
 Open the Web Terminal via `>_`
@@ -352,6 +331,26 @@ tkn pipeline start build-app -p app=app-c -w name=source,volumeClaimTemplateFile
 ----
 
 video::pipeline-assets/start-pipeline-cli.mp4[width=1024]
+
+====
+
+.*Alternative: via WebUI*
+[%collapsible]
+====
+
+repeat this for every `app-a`, `app-b`, `app-c`
+
+ * On the Pipeline detail page after creation, click "Actions" -> Start
+ * Fill out the form
+ ** app: Type onetime `app-a`, next time `app-b` and last time `app-c`
+ ** source: Select `VolumeClaimTemplate`
+ ** git-basic-auth: Select `Sectet`,
+ ** Secret: Select `git-basic-auth`,
+ * Click "Start"
+
+And repeat with the next app.
+
+video::pipeline-assets/start-pipeline-webui.mp4[width=1024]
 
 ====
 
