@@ -24,7 +24,31 @@ h|Select Project|`{USER}-dev`
 
 
  * Select "Secrets" in the Menu
- * Click "Create" -> "Key/Value Secret"
+ * Click "Create" -> "From YAML"
+
+ Select "Secrets" in the menu and click "Create" -> "From Yaml". Copy and paste the Yaml code and hit "Save".
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+kind: Secret
+apiVersion: v1
+metadata:
+  name: git-basic-auth
+  namespace: user1-dev
+stringData:
+  .git-credentials: >-
+    https://{USER}:cds%232023@gitea.{APPS}
+  .gitconfig: >-
+    [credential "https://gitea.{APPS}"]
+      helper = store
+type: Opaque
+----
+
+.*Alternative: Use GUI Form
+[%collapsible]
+====
+ * Select "Secrets" in the Menu
+ * Click "Create" -> "Key/value secret"
  * Fill out the form
  ** Secret name:
 +
@@ -66,9 +90,25 @@ https://{USER}:cds%232023@gitea.{APPS}
 ----
 
 video::pipeline-assets/secret.mp4[width=1024]
+====
 
 === Create a pipeline
 
+ * Click Pipelines
+ * Click "Create" -> "Pipeline"
+
+Copy&paste the Yaml into the Web UI:
+
+video::pipeline-assets/create-yaml.mp4[width=1024]
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+include::content/pipeline-assets/pipeline.yaml[]
+----
+
+.Alternative: Use GUI
+[%collapsible]
+====
  * Click Pipelines
  * Click "Create" -> "Pipeline"
  * Fill out the form
@@ -120,9 +160,9 @@ git-basic-auth
 ----
 
 ==== Add Tasks to Pipeline
-.*Task: git-clone-source*
-[%collapsible]
-====
+
+*Task: git-clone-source*
+
  * In Tasks section, click : "Add task"
  * Search and select for "git-clone" from Red Hat
  * Click "Add"
@@ -141,11 +181,10 @@ git-clone-source
 https://gitea.{APPS}/{USER}/$(params.app).git
 ----
 ** Workspaces, output: Select `source`
-====
 
-.*Task: build*
-[%collapsible]
-====
+
+*Task: build*
+
  * Move the mouse over "git-clone-source", click the blue plus (+) on the right
  * Click "Add Task"
  * Search and select for "buildah" from Red Hat
@@ -171,11 +210,10 @@ image-registry.openshift-image-registry.svc:5000/{USER}-apps/$(params.app):main
 ./Containerfile
 ----
 ** Workspaces, source: Select `source`
-====
 
-.*Task: git-clone-gitops*
-[%collapsible]
-====
+
+*Task: git-clone-gitops*
+
 * Move the mouse over "build", click the blue plus (+) on the right
  * Click "Add Task"
  * Search and select for "git-clone" from Red Hat
@@ -213,11 +251,10 @@ main
 gitops
 ----
 ** Workspaces, output: Select `source`
-====
 
-.*Task: git-cli*
-[%collapsible]
-====
+
+*Task: git-cli*
+
 * Move the mouse over "git-clone-gitops", click the blue plus (+) on the right
  * Click "Add Task"
  * Search and select for "git-cli" from Red Hat
@@ -268,21 +305,8 @@ bot@example.com
  * Click "Create" at the bottom
 
 video::pipeline-assets/create.mp4[width=1024]
-
-.*Solution*
-[%collapsible]
 ====
 
-Copy&paste the solution into the Web UI:
-
-video::pipeline-assets/create-yaml.mp4[width=1024]
-
-[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
-----
-include::content/pipeline-assets/pipeline.yaml[]
-----
-
-====
 
 === Start pipeline for Application - via WebUI OR CLI
 
