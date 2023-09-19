@@ -358,17 +358,13 @@ video::pipeline-assets/start-pipeline-webui.mp4[width=1024]
 
 video::pipeline-assets/create-pipeline-trigger.mp4[width=1024]
 
-.*YAML*
-[%collapsible]
-====
+*YAML*
 [source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
 include::content/pipeline-assets/pipeline-trigger.yaml[]
 ----
-====
 
 === Configure pipeline trigger at Git
-
 
 Configure Gitea to "hit" the trigger at
 
