@@ -26,7 +26,7 @@ h|Select Project|`{USER}-dev`
  * Select "Secrets" in the Menu
  * Click "Create" -> "From YAML"
 
- Select "Secrets" in the menu and click "Create" -> "From Yaml". Copy and paste the Yaml code and hit "Save".
+Select "Secrets" in the menu and click "Create" -> "From Yaml". Copy and paste the Yaml code and hit "Save".
 
 [source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
@@ -44,7 +44,7 @@ stringData:
 type: Opaque
 ----
 
-.*Alternative: Use GUI Form
+.*Alternative: Use GUI Form*
 [%collapsible]
 ====
  * Select "Secrets" in the Menu
