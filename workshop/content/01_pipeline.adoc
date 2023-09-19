@@ -106,7 +106,7 @@ video::pipeline-assets/create-yaml.mp4[width=1024]
 include::content/pipeline-assets/pipeline.yaml[]
 ----
 
-.Alternative: Use GUI
+.Alternative: Use GUI*
 [%collapsible]
 ====
  * Click Pipelines
@@ -300,7 +300,6 @@ bot@example.com
 ----
 ** Workspaces, source: Select `source`
 ** Workspaces, basic-auth: Select `git-basic-auth`
-====
 
  * Click "Create" at the bottom
 
