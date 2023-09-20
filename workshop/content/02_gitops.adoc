@@ -23,6 +23,29 @@ video::gitops-assets/argo-login.mp4[width=1024]
 
 ===== Create GitOps Application
 
+Click on "Import YAML" in the OpenShift WebUI again and paste the ArgoCD app config:
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app
+  namespace: {USER}-dev
+spec:
+  destination:
+    namespace: {USER}-apps
+    server: https://kubernetes.default.svc
+  source:
+    path: .
+    repoURL: https://gitea.{APPS}/{USER1}/gitops.git
+    targetRevision: HEAD
+  project: default
+----
+
+.*Alternative: Use GUI Form*
+[%collapsible]
+====
 [%autowidth]
 |===
 
@@ -48,6 +71,7 @@ h|*Namespace*|`{USER}-apps`
 |===
 
 video::gitops-assets/argo-create-app.mp4[width=1024]
+====
 
 
 ===== Open OpenShift Console & Application URL
