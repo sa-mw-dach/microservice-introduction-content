@@ -8,7 +8,7 @@
 
 == Simple GitOps Application Deployment
 
-===== Open OpenShift GitOps:
+=== Open OpenShift GitOps:
 
 https://argocd-server-{USER}-gitops.{APPS}
 
@@ -21,7 +21,7 @@ h|Password|`{PASSWORD}`
 
 video::gitops-assets/argo-login.mp4[width=1024]
 
-===== Create GitOps Application
+=== Create GitOps Application
 
 Click on "Import YAML" in the OpenShift WebUI again and paste the ArgoCD app config:
 
@@ -73,8 +73,13 @@ h|*Namespace*|`{USER}-apps`
 video::gitops-assets/argo-create-app.mp4[width=1024]
 ====
 
+=== Sync
 
-===== Open OpenShift Console & Application URL
+Now check the apps in ArgoCD and click "Synchronize" to apply everything to OpenShift.
+
+https://argocd-server-{USER}-gitops.{APPS}
+
+=== Open OpenShift Console & Application URL
 
 https://console-openshift-console.{APPS}/topology/ns/{USER}-apps?view=graph
 
