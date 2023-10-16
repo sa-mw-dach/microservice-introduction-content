@@ -37,7 +37,7 @@ metadata:
   namespace: user1-dev
 stringData:
   .git-credentials: >-
-    https://{USER}:cds%232023@gitea.{APPS}
+    https://{USER}:{PASSWORD}@gitea.{APPS}
   .gitconfig: >-
     [credential "https://gitea.{APPS}"]
       helper = store
