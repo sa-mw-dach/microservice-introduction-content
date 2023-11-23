@@ -1,5 +1,5 @@
 ---
-name: Red Hat OpenTour 2022 DACH
+name: Red Hat Developers Hands-On Day 2023
 modules:
   activate:
     - overview
