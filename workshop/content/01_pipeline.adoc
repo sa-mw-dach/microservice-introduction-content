@@ -34,7 +34,7 @@ kind: Secret
 apiVersion: v1
 metadata:
   name: git-basic-auth
-  namespace: user1-dev
+  namespace: {USER}-dev
 stringData:
   .git-credentials: >-
     https://{USER}:{PASSWORD}@gitea.{APPS}
@@ -69,7 +69,7 @@ git-basic-auth
 +
 [source,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
-https://{USER}:cds%232023@gitea.{APPS}
+https://{USER}:{PASSWORD}@gitea.{APPS}
 ----
 
  * Click "Add key/value"
