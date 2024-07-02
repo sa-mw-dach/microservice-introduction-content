@@ -7,8 +7,9 @@ COPY . /tmp/src
 RUN rm -rf /tmp/src/.git* && \
     chown -R 1001 /tmp/src && \
     chgrp -R 0 /tmp/src && \
-    chmod -R g+w /tmp/src && \
-    yum install -y vim-enhanced
+    chmod -R g+w /tmp/src
+# && \
+#    yum install -y vim-enhanced
 
 # Fixed include::
 RUN cd /opt/workshop/renderer && \
