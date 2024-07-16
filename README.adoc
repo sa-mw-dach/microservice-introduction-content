@@ -1,5 +1,12 @@
 === Getting Started
 
+How to start:
+
+```
+podman run --rm --name antora -v $PWD:/antora:z -p 8080:8080 -i -t ghcr.io/juliaaano/antora-viewer
+```
+
+
 . Create a git repo from this template
 . Clone the repo and `cd` into it
 . Run ./utilities/lab-serve
