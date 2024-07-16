@@ -1,34 +1,58 @@
-:markup-in-source: verbatim,attributes,quotes
+=== Getting Started
 
-= Bookbag Demo
+. Create a git repo from this template
+. Clone the repo and `cd` into it
+. Run ./utilities/lab-serve
+. Open http://localhost:8080 in your browser
+. Run ./utilities/lab-build to build your html
 
-== Content
+Your lab should now update and on day 1 will look more or less like this:
 
-This repository contains Bookbag (openshift-homeroom) demo lab.
-The lab content can be found at the links below.
+image::.images/lab-image.png[Lab Image]
 
-xref:workshop/content/overview.adoc[Overview]
+Now you are ready to go!  You can start editing the files in the `content/modules/ROOT/pages/` directory.
 
-xref:workshop/content/getting-started.adoc[Getting Started]
+**Today** you have to run `./utilites/build` to rebuild your html but *very shortly* we will be adding live updating.
+I.E. on every save the lab will re-build in real time.
+In addition, many modern editors such as Visual Studio Code offer live Asciidoc Preview extensions.
 
-xref:workshop/content/workshop-content.adoc[Workshop Content]
+=== Understanding the Basic Template Directory Structure
 
-xref:workshop/content/workshop-vars.adoc[Workshop Variables]
+[source,sh]
+----
+./content/modules/ROOT/
+├── assets
+│   └── images                       # Images used in your content 
+│       └── example-image.png
+├── examples                         # You can add downloadable assets here 
+│   └── example-bash-script.sh       # e.g. an example bash script
+├── nav.adoc                         # Navigation for your lab
+├── pages                            # Your content goes here
+│   ├── index.adoc                   # First page of your lab, e.g. overview etc 
+│   ├── module-02.adoc
+│   └── module-03.adoc               # Sample lab has 3 modules including index.adoc
+└── partials                         # You can add partials here, reusable content inserted inline into your modules
+    └── example_partial.adoc
+----
 
-xref:workshop/content/openshift-cluster-access.adoc[OpenShift Console and Access]
+=== Development Cycle
 
-xref:workshop/content/authentication.adoc[Authentication]
+. Edit your content in `content/modules/ROOT/pages/`
+. Run `./utilities/build` to build your html
+. Use `git` to branch and commit your work
+. Push your work to your repo
+.. You should use `git tags` or `git branches` in production
+.. However development items default to the head of `main`
 
-xref:workshop/content/terminal-configuration.adoc[Terminal Configuration]
+=== Configuring your Lab 
 
-xref:workshop/content/slide-content.adoc[Slides]
+Project Zero Lab repos have 3 *yaml* files that control the build and deployment of your lab.
+However _typically_ you will only need to only make very few edits 
 
-xref:workshop/content/building-and-testing.adoc[Building and Testing]
-
-xref:workshop/content/agnosticd-integration.adoc[AgnosticD Integration]
-
-== Development
-
-Information on developing this demo:
-
-xref:Development.adoc[Development]
+[source,sh]
+----
+├── content
+│   └── antora.yml                  # You can add "inline vars" here to render within your content
+├── zero-touch-config.yml            # 
+└── zero-touch-site.yml
+----
