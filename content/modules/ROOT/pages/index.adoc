@@ -1,38 +1,10 @@
-:GUID: %guid%
-:APPS: %cluster_subdomain%
-:USER: %user%
-:PASSWORD: %password%
+== Microservice Introduction
 
-:markup-in-source: verbatim,attributes,quotes
+In this lab we'll explore, how to run microservices on OpenShift Container Platform.
 
-
-
-
-
-== Start your Web Terminal
-
-
-1. Open OpenShift WebConsole and Login: https://console-openshift-console.{APPS}[window=_blank]
-
-
-2. Fill out the Login form:
-+
-[%autowidth]
-|===
-h|Username|`{USER}`
-h|Password|`{PASSWORD}`
-|===
-
-3. Click "Skip Tour"
-
-4. Select project/namespace: `{USER}-dev`
-
-5. Click `>_` Icon on the top right corner
-
-6. Click Start to start your Web Terminal
-
-
-video::terminal.mp4[width=1024]
+* Step 1: Build microservices with OpenShift Pipelines
+* Step 2: Automate the deployment with OpenShift GitOps
+* Step 3: Use OpenShift Service Mesh to enhance Observability, Resiliency and Security of your microservices
 
 
 
