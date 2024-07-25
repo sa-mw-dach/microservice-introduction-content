@@ -1,5 +1,0 @@
-:markup-in-source: verbatim,attributes,quotes
-
-== Access Password
-
-== OpenShift Cluster SSO
