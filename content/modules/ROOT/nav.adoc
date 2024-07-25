@@ -1,10 +1,8 @@
 
 * xref:module-01.adoc[Start (Environment Overview)]
 
-* xref:module-02.adoc[GitOps]
+* xref:01_pipeline.adoc[Pipeline]
 
-* xref:module-03.adoc[Pipeline]
-** xref:module-03.adoc#prerequisites[Install Prerequisites]
-** xref:module-03.adoc#container[Enable Container]
+* xref:02_gitops.adoc[GitOps]
 
-* xref:module-03.adoc[Service Mesh]
+* xref:03_service-mesh.adoc[Service Mesh]
