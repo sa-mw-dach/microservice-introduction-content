@@ -1,7 +1,7 @@
-:GUID: %guid%
-:APPS: %openshift_cluster_ingress_domain%
-:USER: %user%
-:PASSWORD: %password%
+:GUID: {guid}
+:APPS: {openshift_cluster_ingress_domain}
+:USER: {user}
+:PASSWORD: {password}
 
 :markup-in-source: verbatim,attributes,quotes
 :source-highlighter: rouge
