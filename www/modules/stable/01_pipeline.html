@@ -110,7 +110,7 @@
 <div class="sect2">
 <h3 id="_open_openshift_console"><a class="anchor" href="#_open_openshift_console"></a>Open OpenShift Console</h3>
 <div class="paragraph">
-<p><a href="https://console-openshift-console.%cluster_subdomain%/topology/ns/user1-dev?view=graph" class="bare">https://console-openshift-console.%cluster_subdomain%/topology/ns/user1-dev?view=graph</a></p>
+<p><a href="https://console-openshift-console.%cluster_subdomain%/topology/ns/user-dev?view=graph" class="bare">https://console-openshift-console.%cluster_subdomain%/topology/ns/user-dev?view=graph</a></p>
 </div>
 <table class="tableblock frame-all grid-all fit-content">
 <colgroup>
@@ -120,7 +120,7 @@
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Select Project</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user1-dev</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user-dev</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -149,10 +149,10 @@
 apiVersion: v1
 metadata:
   name: git-basic-auth
-  namespace: user1-dev
+  namespace: user-dev
 stringData:
   .git-credentials: &gt;-
-    https://user1:secret-password@gitea.%cluster_subdomain%
+    https://user:password@gitea.%cluster_subdomain%
   .gitconfig: &gt;-
     [credential "https://gitea.%cluster_subdomain%"]
       helper = store
@@ -194,7 +194,7 @@ type: Opaque</code></pre>
 <p>Value:</p>
 <div class="listingblock copy">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">https://user1:secret-password@gitea.%cluster_subdomain%</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">https://user:password@gitea.%cluster_subdomain%</code></pre>
 </div>
 </div>
 </li>
@@ -401,7 +401,7 @@ Your browser does not support the video tag.
 <p>URL:</p>
 <div class="listingblock copy">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">https://gitea.%cluster_subdomain%/user1/$(params.app).git</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">https://gitea.%cluster_subdomain%/user/$(params.app).git</code></pre>
 </div>
 </div>
 </li>
@@ -449,7 +449,7 @@ Your browser does not support the video tag.
 <p>IMAGE:</p>
 <div class="listingblock copy">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">image-registry.openshift-image-registry.svc:5000/user1-apps/$(params.app):main</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">image-registry.openshift-image-registry.svc:5000/user-apps/$(params.app):main</code></pre>
 </div>
 </div>
 </li>
@@ -505,7 +505,7 @@ Your browser does not support the video tag.
 <p>url:</p>
 <div class="listingblock copy">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-none hljs">https://gitea.%cluster_subdomain%/user1/gitops.git</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-none hljs">https://gitea.%cluster_subdomain%/user/gitops.git</code></pre>
 </div>
 </div>
 </li>
@@ -729,7 +729,117 @@ Your browser does not support the video tag.
 </div>
 <div class="listingblock copy">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-yaml hljs" data-lang="yaml">Unresolved include directive in modules/ROOT/pages/01_pipeline.adoc - include::content/pipeline-assets/pipeline-trigger.yaml[]</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-yaml hljs" data-lang="yaml">apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: build-app-pipeline-trigger-template
+  namespace: user-dev
+  annotations:
+    triggers.tekton.dev/old-escape-quotes: 'true'
+spec:
+  params:
+    - name: repo
+      description: The Git repo name
+    - name: branch
+      description: The Git repo branch name
+    - name: hook-type
+      description: The Webhook type - branch or tag
+    - name: username
+      description: The user that created the branch
+    - name: repo_name
+      description: "Name of the repo/app: app-a, app-b or app-c"
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: build-app-
+      spec:
+        params:
+          - name: app
+            value: $(tt.params.repo_name)
+          - name: GIT_REPO
+            value: $(tt.params.repo)
+          - name: GIT_REVISION
+            value: $(tt.params.branch)
+          - name: PATH_CONTEXT
+            value: .
+          - name: VERSION
+            value: openjdk-17-ubi8
+        pipelineRef:
+          name: build-app
+        serviceAccountName: pipeline
+        timeout: 1h0m0s
+        workspaces:
+          - name: git-basic-auth
+            secret:
+              secretName: git-basic-auth
+          - name: source
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: build-app-pipeline-trigger-binding
+  namespace: user-dev
+spec:
+  # https://docs.gitea.com/next/usage/webhooks#event-information
+  params:
+    - name: repo
+      value: "$(body.repository.clone_url)"
+    - name: repo_name
+      value: "$(body.repository.name)"
+    - name: branch
+      value: "$(body.ref)"
+    - name: hook-type
+      value: "$(header.X-Gitea-Event)"
+    - name: username
+      value: "$(body.sender.username)"
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: build-app-pipeline-trigger
+  namespace: user-dev
+spec:
+  interceptors: []
+  bindings:
+  - ref: build-app-pipeline-trigger-binding
+  template:
+    ref: build-app-pipeline-trigger-template
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: build-app-pipeline-trigger-listener
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - triggerRef: build-app-pipeline-trigger
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: build-app-trigger
+  namespace: user-dev
+spec:
+  port:
+    targetPort: http-listener
+  to:
+    kind: Service
+    name: el-build-app-pipeline-trigger-listener
+    weight: 100
+  wildcardPolicy: None
+  tls:
+    termination: edge
+  insecureEdgeTerminationPolicy: Redirect</code></pre>
 </div>
 </div>
 </div>
@@ -741,13 +851,13 @@ Your browser does not support the video tag.
 <div class="ulist">
 <ul>
 <li>
-<p>app-a: <a href="https://gitea.%cluster_subdomain%/user1/app-a/settings/hooks" class="bare">https://gitea.%cluster_subdomain%/user1/app-a/settings/hooks</a></p>
+<p>app-a: <a href="https://gitea.%cluster_subdomain%/user/app-a/settings/hooks" class="bare">https://gitea.%cluster_subdomain%/user/app-a/settings/hooks</a></p>
 </li>
 <li>
-<p>app-b: <a href="https://gitea.%cluster_subdomain%/user1/app-b/settings/hooks" class="bare">https://gitea.%cluster_subdomain%/user1/app-b/settings/hooks</a></p>
+<p>app-b: <a href="https://gitea.%cluster_subdomain%/user/app-b/settings/hooks" class="bare">https://gitea.%cluster_subdomain%/user/app-b/settings/hooks</a></p>
 </li>
 <li>
-<p>app-c: <a href="https://gitea.%cluster_subdomain%/user1/app-c/settings/hooks" class="bare">https://gitea.%cluster_subdomain%/user1/app-c/settings/hooks</a></p>
+<p>app-c: <a href="https://gitea.%cluster_subdomain%/user/app-c/settings/hooks" class="bare">https://gitea.%cluster_subdomain%/user/app-c/settings/hooks</a></p>
 </li>
 </ul>
 </div>
@@ -759,15 +869,15 @@ Your browser does not support the video tag.
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">User</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">user1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">user</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Password</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock">secret-password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">password</p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Trigger URL</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://build-app-trigger-user1-dev.%cluster_subdomain%" class="bare">https://build-app-trigger-user1-dev.%cluster_subdomain%</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://build-app-trigger-user-dev.%cluster_subdomain%" class="bare">https://build-app-trigger-user-dev.%cluster_subdomain%</a></p></td>
 </tr>
 </tbody>
 </table>

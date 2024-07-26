@@ -103,7 +103,7 @@ video::pipeline-assets/create-yaml.mp4[width=1024]
 
 [source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
-include::content/pipeline-assets/pipeline.yaml[]
+include::../partials/pipeline.yaml[]
 ----
 
 .*Alternative: Use GUI*
@@ -361,7 +361,7 @@ video::pipeline-assets/create-pipeline-trigger.mp4[width=1024]
 *YAML*
 [source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
 ----
-include::content/pipeline-assets/pipeline-trigger.yaml[]
+include::../partials/pipeline-trigger.yaml[]
 ----
 
 === Configure pipeline trigger at Git

@@ -110,7 +110,7 @@
 <div class="sect2">
 <h3 id="_open_openshift_gitops"><a class="anchor" href="#_open_openshift_gitops"></a>Open OpenShift GitOps:</h3>
 <div class="paragraph">
-<p><a href="https://argocd-server-user1-gitops.%cluster_subdomain%" class="bare">https://argocd-server-user1-gitops.%cluster_subdomain%</a></p>
+<p><a href="https://argocd-server-user-gitops.%cluster_subdomain%" class="bare">https://argocd-server-user-gitops.%cluster_subdomain%</a></p>
 </div>
 <table class="tableblock frame-all grid-all fit-content">
 <colgroup>
@@ -120,11 +120,11 @@
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Username</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user</code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Password</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>secret-password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -147,14 +147,14 @@ Your browser does not support the video tag.
 kind: Application
 metadata:
   name: app
-  namespace: user1-gitops
+  namespace: user-gitops
 spec:
   destination:
-    namespace: user1-apps
+    namespace: user-apps
     server: https://kubernetes.default.svc
   source:
     path: .
-    repoURL: https://gitea.%cluster_subdomain%/user1/gitops.git
+    repoURL: https://gitea.%cluster_subdomain%/user/gitops.git
     targetRevision: HEAD
   project: default</code></pre>
 </div>
@@ -188,7 +188,7 @@ spec:
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Repository URL</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://gitea.%cluster_subdomain%/user1/gitops.git" class="bare">https://gitea.%cluster_subdomain%/user1/gitops.git</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="https://gitea.%cluster_subdomain%/user/gitops.git" class="bare">https://gitea.%cluster_subdomain%/user/gitops.git</a></code></p></td>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Revision</p></th>
@@ -207,7 +207,7 @@ spec:
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock"><strong>Namespace</strong></p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user1-apps</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user-apps</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -227,13 +227,13 @@ Your browser does not support the video tag.
 <p>Now check the apps in ArgoCD and click "Synchronize" to apply everything to OpenShift.</p>
 </div>
 <div class="paragraph">
-<p><a href="https://argocd-server-user1-gitops.%cluster_subdomain%" class="bare">https://argocd-server-user1-gitops.%cluster_subdomain%</a></p>
+<p><a href="https://argocd-server-user-gitops.%cluster_subdomain%" class="bare">https://argocd-server-user-gitops.%cluster_subdomain%</a></p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_open_openshift_console_application_url"><a class="anchor" href="#_open_openshift_console_application_url"></a>Open OpenShift Console &amp; Application URL</h3>
 <div class="paragraph">
-<p><a href="https://console-openshift-console.%cluster_subdomain%/topology/ns/user1-apps?view=graph" class="bare">https://console-openshift-console.%cluster_subdomain%/topology/ns/user1-apps?view=graph</a></p>
+<p><a href="https://console-openshift-console.%cluster_subdomain%/topology/ns/user-apps?view=graph" class="bare">https://console-openshift-console.%cluster_subdomain%/topology/ns/user-apps?view=graph</a></p>
 </div>
 <div class="videoblock">
 <div class="content">
@@ -243,7 +243,7 @@ Your browser does not support the video tag.
 </div>
 </div>
 <div class="paragraph">
-<p>Application URL: <a href="https://https://app-a-user1-apps.%cluster_subdomain%" class="bare">https://https://app-a-user1-apps.%cluster_subdomain%</a></p>
+<p>Application URL: <a href="https://https://app-a-user-apps.%cluster_subdomain%" class="bare">https://https://app-a-user-apps.%cluster_subdomain%</a></p>
 </div>
 </div>
 </div>

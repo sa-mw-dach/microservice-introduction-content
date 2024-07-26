@@ -149,7 +149,7 @@
 <tbody>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Select Project</p></th>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user1-service-mesh-system</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user-service-mesh-system</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -168,16 +168,16 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">oc project user1-apps</code></pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">oc project user-apps</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Open Gitea and select the Gitops project. You&#8217;ll find Gitea here:
-Git Repo URL <a href="https://gitea.%cluster_subdomain%/user1/gitops" class="bare">https://gitea.%cluster_subdomain%/user1/gitops</a></p>
+Git Repo URL <a href="https://gitea.%cluster_subdomain%/user/gitops" class="bare">https://gitea.%cluster_subdomain%/user/gitops</a></p>
 </div>
 <div class="paragraph">
 <p>Changes in the Git repo will be synced from ArgoCD as before.
-ArgoCD URL <a href="https://argocd-server-user1-gitops.%cluster_subdomain%" class="bare">https://argocd-server-user1-gitops.%cluster_subdomain%</a></p>
+ArgoCD URL <a href="https://argocd-server-user-gitops.%cluster_subdomain%" class="bare">https://argocd-server-user-gitops.%cluster_subdomain%</a></p>
 </div>
 <div class="paragraph">
 <p>To make our apps managed by Istio Service Mesh, we have to add the corresponding annotation in our Deployment files. Add in the Deployment metadata section of the template for all deployment files:</p>
@@ -202,7 +202,7 @@ ArgoCD URL <a href="https://argocd-server-user1-gitops.%cluster_subdomain%" clas
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ROUTE=$(oc get route istio-ingressgateway -n user1-service-mesh-system --template='{{ .spec.host }}')
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ROUTE=$(oc get route istio-ingressgateway -n user-service-mesh-system --template='{{ .spec.host }}')
 curl $ROUTE/service-a</code></pre>
 </div>
 </div>
@@ -240,9 +240,9 @@ while true; do curl $ROUTE/service-a; sleep 0.5; done</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">oc get pod -n user1-apps
+<pre class="highlightjs highlight"><code class="language-none hljs">oc get pod -n user-apps
 POD_NAME=....
-oc port-forward pod/$POD_NAME -n user1-apps 8080:8080</code></pre>
+oc port-forward pod/$POD_NAME -n user-apps 8080:8080</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -313,19 +313,19 @@ oc port-forward pod/$POD_NAME -n user1-apps 8080:8080</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user1-keycloak.%cluster_subdomain%" class="bare">https://keycloak-user1-keycloak.%cluster_subdomain%</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%cluster_subdomain%" class="bare">https://keycloak-user-keycloak.%cluster_subdomain%</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak Admin Console</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user1-keycloak.%cluster_subdomain%/admin" class="bare">https://keycloak-user1-keycloak.%cluster_subdomain%/admin</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%cluster_subdomain%/admin" class="bare">https://keycloak-user-keycloak.%cluster_subdomain%/admin</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak Account Console</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user1-keycloak.%cluster_subdomain%/realms/myrealm/account" class="bare">https://keycloak-user1-keycloak.%cluster_subdomain%/realms/myrealm/account</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%cluster_subdomain%/realms/myrealm/account" class="bare">https://keycloak-user-keycloak.%cluster_subdomain%/realms/myrealm/account</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Keycloak Service</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">keycloak.user1-keycloak.svc.cluster.local</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">keycloak.user-keycloak.svc.cluster.local</p></td>
 </tr>
 </tbody>
 </table>
@@ -369,7 +369,7 @@ oc port-forward pod/$POD_NAME -n user1-apps 8080:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-bash hljs" data-lang="bash">CLIENT_SECRET=...
 
-curl --insecure -L -X POST "https://keycloak-user1-keycloak.%cluster_subdomain%/realms/myrealm/protocol/openid-connect/token" \
+curl --insecure -L -X POST "https://keycloak-user-keycloak.%cluster_subdomain%/realms/myrealm/protocol/openid-connect/token" \
 -H "Content-Type: application/x-www-form-urlencoded" \
 --data-urlencode "client_id=myclient" \
 --data-urlencode "grant_type=password" \
@@ -384,7 +384,7 @@ curl --insecure -L -X POST "https://keycloak-user1-keycloak.%cluster_subdomain%/
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-bash hljs" data-lang="bash">TOKEN=$(curl --insecure -L -X POST "https://keycloak-user1-keycloak.%cluster_subdomain%/realms/myrealm/protocol/openid-connect/token" \
+<pre class="highlightjs highlight nowrap"><code class="language-bash hljs" data-lang="bash">TOKEN=$(curl --insecure -L -X POST "https://keycloak-user-keycloak.%cluster_subdomain%/realms/myrealm/protocol/openid-connect/token" \
 -H "Content-Type: application/x-www-form-urlencoded" \
 --data-urlencode "client_id=myclient" \
 --data-urlencode "grant_type=password" \
