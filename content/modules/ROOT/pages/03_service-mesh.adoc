@@ -1,5 +1,5 @@
 :GUID: %guid%
-:APPS: %cluster_subdomain%
+:APPS: %openshift_cluster_ingress_domain%
 :USER: %user%
 :PASSWORD: %password%
 :openshift_console_url: %openshift_console_url%

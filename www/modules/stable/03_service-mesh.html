@@ -173,11 +173,11 @@
 </div>
 <div class="paragraph">
 <p>Open Gitea and select the Gitops project. You&#8217;ll find Gitea here:
-Git Repo URL <a href="https://gitea.%cluster_subdomain%/user/gitops" class="bare">https://gitea.%cluster_subdomain%/user/gitops</a></p>
+Git Repo URL <a href="https://gitea.%openshift_cluster_ingress_domain%/user/gitops" class="bare">https://gitea.%openshift_cluster_ingress_domain%/user/gitops</a></p>
 </div>
 <div class="paragraph">
 <p>Changes in the Git repo will be synced from ArgoCD as before.
-ArgoCD URL <a href="https://argocd-server-user-gitops.%cluster_subdomain%" class="bare">https://argocd-server-user-gitops.%cluster_subdomain%</a></p>
+ArgoCD URL <a href="https://argocd-server-user-gitops.%openshift_cluster_ingress_domain%" class="bare">https://argocd-server-user-gitops.%openshift_cluster_ingress_domain%</a></p>
 </div>
 <div class="paragraph">
 <p>To make our apps managed by Istio Service Mesh, we have to add the corresponding annotation in our Deployment files. Add in the Deployment metadata section of the template for all deployment files:</p>
@@ -313,15 +313,15 @@ oc port-forward pod/$POD_NAME -n user-apps 8080:8080</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%cluster_subdomain%" class="bare">https://keycloak-user-keycloak.%cluster_subdomain%</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%openshift_cluster_ingress_domain%" class="bare">https://keycloak-user-keycloak.%openshift_cluster_ingress_domain%</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak Admin Console</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%cluster_subdomain%/admin" class="bare">https://keycloak-user-keycloak.%cluster_subdomain%/admin</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%openshift_cluster_ingress_domain%/admin" class="bare">https://keycloak-user-keycloak.%openshift_cluster_ingress_domain%/admin</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak Account Console</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%cluster_subdomain%/realms/myrealm/account" class="bare">https://keycloak-user-keycloak.%cluster_subdomain%/realms/myrealm/account</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.%openshift_cluster_ingress_domain%/realms/myrealm/account" class="bare">https://keycloak-user-keycloak.%openshift_cluster_ingress_domain%/realms/myrealm/account</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Keycloak Service</p></td>
@@ -369,7 +369,7 @@ oc port-forward pod/$POD_NAME -n user-apps 8080:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-bash hljs" data-lang="bash">CLIENT_SECRET=...
 
-curl --insecure -L -X POST "https://keycloak-user-keycloak.%cluster_subdomain%/realms/myrealm/protocol/openid-connect/token" \
+curl --insecure -L -X POST "https://keycloak-user-keycloak.%openshift_cluster_ingress_domain%/realms/myrealm/protocol/openid-connect/token" \
 -H "Content-Type: application/x-www-form-urlencoded" \
 --data-urlencode "client_id=myclient" \
 --data-urlencode "grant_type=password" \
@@ -384,7 +384,7 @@ curl --insecure -L -X POST "https://keycloak-user-keycloak.%cluster_subdomain%/r
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-bash hljs" data-lang="bash">TOKEN=$(curl --insecure -L -X POST "https://keycloak-user-keycloak.%cluster_subdomain%/realms/myrealm/protocol/openid-connect/token" \
+<pre class="highlightjs highlight nowrap"><code class="language-bash hljs" data-lang="bash">TOKEN=$(curl --insecure -L -X POST "https://keycloak-user-keycloak.%openshift_cluster_ingress_domain%/realms/myrealm/protocol/openid-connect/token" \
 -H "Content-Type: application/x-www-form-urlencoded" \
 --data-urlencode "client_id=myclient" \
 --data-urlencode "grant_type=password" \
