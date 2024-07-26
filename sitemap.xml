@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>https://redhat-scholars.github.io/course-template/modules/stable/01_pipeline.html</loc>
+<lastmod>2024-07-26T15:59:33.330Z</lastmod>
+</url>
+<url>
+<loc>https://redhat-scholars.github.io/course-template/modules/stable/02_gitops.html</loc>
+<lastmod>2024-07-26T15:59:33.330Z</lastmod>
+</url>
+<url>
+<loc>https://redhat-scholars.github.io/course-template/modules/stable/03_service-mesh.html</loc>
+<lastmod>2024-07-26T15:59:33.330Z</lastmod>
+</url>
+<url>
+<loc>https://redhat-scholars.github.io/course-template/modules/stable/environment.html</loc>
+<lastmod>2024-07-26T15:59:33.330Z</lastmod>
+</url>
+<url>
+<loc>https://redhat-scholars.github.io/course-template/modules/stable/index.html</loc>
+<lastmod>2024-07-26T15:59:33.330Z</lastmod>
+</url>
+<url>
+<loc>https://redhat-scholars.github.io/course-template/modules/stable/terminal-configuration.html</loc>
+<lastmod>2024-07-26T15:59:33.330Z</lastmod>
+</url>
+</urlset>

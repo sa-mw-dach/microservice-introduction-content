@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Cloud Native Robotz Hackathon</title>
+    <link rel="canonical" href="https://redhat-scholars.github.io/course-template/modules/stable/03_service-mesh.html">
+    <link rel="prev" href="02_gitops.html">
+    <meta name="generator" content="Antora 3.1.9">
+    <link rel="stylesheet" href="../../_/css/site.css">
+<link rel="icon" href="../../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://demo.redhat.com" target="_blank">
+        <img src="../../_/img/rhdp-logo.svg" height="35px" alt="Red Hat Demo Platform">
+      </a>
+      <a class="navbar-item" href="https://redhat-scholars.github.io/course-template">Cloud Native Robotz Hackathon</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Help</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" target="_blank" href="https://redhat.service-now.com/help?id=sc_cat_item&sys_id=00c0316a1bf39450e43942a7bc4bcbd1">Open Support Case</a>
+            <a class="navbar-item" target="_blank" href="https://rhdp.statuspage.io/">Status Page</a>
+            <a class="navbar-item" target="_blank" href="https://demo.redhat.com/support">Solution Support: Service Level</a>
+            <a class="navbar-item" target="_blank" href="https://content.redhat.com/us/en/product/cross-portfolio-initiatives/rhdp.html">Learn more</a>
+            <a class="navbar-item" target="_blank" href="https://videos.learning.redhat.com/channel/RHPDS%2B-%2BRed%2BHat%2BProduct%2Band%2BPortfolio%2BDemo%2BSystem/277722533">How to videos</a>
+          </div>
+        </div>
+        <a class="navbar-item" target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSfwGW7ql2lDfaLDpg4Bgj_puFEVsM0El6-Nz8fyH48RnGLDrA/viewform">Feedback</a>
+        <a class="navbar-item" href="https://developers.redhat.com/events/" target="_blank">Upcoming Events</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="modules" data-version="stable">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">Lab guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="environment.html">Start (Environment Overview)</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="01_pipeline.html">Pipeline</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="02_gitops.html">GitOps</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="03_service-mesh.html">Service Mesh</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Lab guide</span>
+    <span class="version">stable</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Lab guide</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">stable</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Lab guide</a></li>
+    <li><a href="03_service-mesh.html">Service Mesh</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/sa-mw-dach/microservice-introduction-content/edit/main/content/modules/ROOT/pages/03_service-mesh.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<div class="sect1">
+<h2 id="_service_mesh"><a class="anchor" href="#_service_mesh"></a>Service Mesh</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this workshop we&#8217;ll have a look at how a Service Mesh can help us to enhance the Security, Observability and Resiliency of our microservices. And all that without the need to add any libraries or to write infrastructure-related code.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_sample_apps"><a class="anchor" href="#_the_sample_apps"></a>The sample apps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We have 3 sample apps, called Service A, B and C.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Service A: Python app which calls Service B<br>
+<a href="https://github.com/sa-mw-dach/microservice-introduction-app-a" class="bare">https://github.com/sa-mw-dach/microservice-introduction-app-a</a></p>
+</li>
+<li>
+<p>Service B: TypeScript/Deno app which calls Service C<br>
+<a href="https://github.com/sa-mw-dach/microservice-introduction-app-b" class="bare">https://github.com/sa-mw-dach/microservice-introduction-app-b</a></p>
+</li>
+<li>
+<p>Service C: Java app with endpoints to simulate failures<br>
+<a href="https://github.com/sa-mw-dach/microservice-introduction-app-c" class="bare">https://github.com/sa-mw-dach/microservice-introduction-app-c</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_openshift_service_mesh_preparation"><a class="anchor" href="#_openshift_service_mesh_preparation"></a>OpenShift Service Mesh preparation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the cluster Service Mesh is already installed. You can check it in the dedicated Service Mesh namespace:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Select Project</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>user-service-mesh-system</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Check the operators installed in the Admin perspective, Operators. All Service Mesh related Operators should be there and ready.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_the_service_mesh"><a class="anchor" href="#_using_the_service_mesh"></a>Using the Service Mesh</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_add_service_mesh_to_our_apps"><a class="anchor" href="#_add_service_mesh_to_our_apps"></a>Add Service Mesh to our apps</h3>
+<div class="paragraph">
+<p>First, switch to the apps project:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">oc project user-apps</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Open Gitea and select the Gitops project. You&#8217;ll find Gitea here:
+Git Repo URL <a href="https://gitea.apps.cluster-guid.guid.exmaple.com/user/gitops" class="bare">https://gitea.apps.cluster-guid.guid.exmaple.com/user/gitops</a></p>
+</div>
+<div class="paragraph">
+<p>Changes in the Git repo will be synced from ArgoCD as before.
+ArgoCD URL <a href="https://argocd-server-user-gitops.apps.cluster-guid.guid.exmaple.com" class="bare">https://argocd-server-user-gitops.apps.cluster-guid.guid.exmaple.com</a></p>
+</div>
+<div class="paragraph">
+<p>To make our apps managed by Istio Service Mesh, we have to add the corresponding annotation in our Deployment files. Add in the Deployment metadata section of the template for all deployment files:</p>
+</div>
+<div class="listingblock copy">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-yaml hljs" data-lang="yaml">annotations:
+  sidecar.istio.io/inject: "true"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sync ArgoCD and the Deployments are recreated. Check the pods - all pods should be running and you should see in the READY column "2/2". Why 2? In the pod are 2 containers - one for the app and one for the Envoy Sidecar. You can also analyze the containers in the pod in the OpenShift Web Console.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_create_a_gateway_for_ingress"><a class="anchor" href="#_create_a_gateway_for_ingress"></a>Create a Gateway for Ingress</h3>
+<div class="paragraph">
+<p>Good practice is, to route all traffic to our current version, so future deployments of new versions don&#8217;t get traffic by accident. For that we&#8217;ve provided DestinationRules and VirtualServices for all our apps. You&#8217;ll find these in the <code>servicemesh</code> folder, together with a Gateway file. Gateway exposes our app-a via Istio Ingress Gateway. To apply these files, add the <code>servicemesh</code> folder to <code>kustomization.yml</code> and let ArgoCD sync.</p>
+</div>
+<div class="paragraph">
+<p>When everything is applied and the Gateway is ready, find out the Gateway URL to call our app-a endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ROUTE=$(oc get route istio-ingressgateway -n user-service-mesh-system --template='{{ .spec.host }}')
+curl $ROUTE/service-a</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the services respond correctly, continue. And now it&#8217;s a good opportunity, to create some traffic and to explore our Obersability tools, Kiali and Jager. Maybe create a loop to generate some traffic, and have a look at Kiali and Jaeger Distributed Tracing*. You&#8217;ll find the URLs in OpenShift, Networking.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">while true; do curl $ROUTE/service-a; sleep 0.5; done</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>(*) The Envoy Sidecar automatically injects tracing headers and sends traffic metadata to Kiali and Jaeger. For the Distributed Tracing, you must propagate the tracing headers when doing calls to other services. See <a href="https://istio.io/latest/docs/tasks/observability/distributed-tracing/overview/">Istio Header Propagation</a>.</em></p>
+</div>
+<div class="paragraph">
+<p>Now as we have our apps running in a Service Mesh and our Observability tools seem to be working, let&#8217;s add some resiliency to our service landscape to avoid cascading failures and the propagation of errors to our end users.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_circuit_breaker_and_retry"><a class="anchor" href="#_circuit_breaker_and_retry"></a>Circuit Breaker and Retry</h3>
+<div class="paragraph">
+<p>Let&#8217;s start by scaling our app-c to 2. You can do that in the Deployment file of app-c in Gitea.</p>
+</div>
+<div class="paragraph">
+<p>Start again our loop to call the endpoint auf app-a:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">ROUTE=...
+while true; do curl $ROUTE/service-a; sleep 0.5; done</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now let&#8217;s crash app-c. There&#8217;s a <code>/crash</code> endpoint, we just have to find a way to call that route. To do that, we use port-fowarding, so do a port-forward for one of the 2 app-c pods:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">oc get pod -n user-apps
+POD_NAME=....
+oc port-forward pod/$POD_NAME -n user-apps 8080:8080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And in a third terminal, call <code>localhost:8080/crash</code> and observe the loop - half of the calls crash and the error is propagated to our users.</p>
+</div>
+<div class="paragraph">
+<p>First step to more resiliency is a Circuit Breaker that kicks in and gives the crashed pod time to recover. The Circuit Breaker is configured in a DestinationRule. Open the file <code>app-c-dr-vs.yml</code> in the <code>servicemesh folder</code> and add the Circuit Breaker configuration to the spec section of the DestinationRule:</p>
+</div>
+<div class="listingblock copy">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-yaml hljs" data-lang="yaml">trafficPolicy:
+  connectionPool:
+    tcp:
+      maxConnections: 100
+    http:
+      http2MaxRequests: 1000
+      maxRequestsPerConnection: 10
+  outlierDetection:
+    baseEjectionTime: 10s
+    consecutive5xxErrors: 1
+    interval: 2s
+    maxEjectionPercent: 100</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Better, but still some errors. Let&#8217;s apply the retry policy. In the same file, add the Retry policy to the VirtualService for the <code>http</code> <code>route</code>:</p>
+</div>
+<div class="listingblock copy">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-yaml hljs" data-lang="yaml">retries:
+  attempts: 3
+  perTryTimeout: 1s
+  retryOn: 5xx</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now all errors are gone.</p>
+</div>
+<div class="paragraph">
+<p>Finally, "repair" the crashed pod by calling the repair endpoint:</p>
+</div>
+<div class="paragraph">
+<p><strong>Terminal 2:</strong><br>
+<code>curl localhost:8080/repair</code></p>
+</div>
+<div class="paragraph">
+<p>After ~10 seconds the repaired pod gets traffic (Circuit Breaker goes from open to close).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_authentication_and_authorization"><a class="anchor" href="#_authentication_and_authorization"></a>Authentication and Authorization</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We use Keycloak to manage our users. User can login via Keycloak and we configure Service Mesh to protect our services and validate a JWT against Keycloak, so only authenticated and authorized users can call our services.</p>
+</div>
+<div class="sect2">
+<h3 id="_configuration"><a class="anchor" href="#_configuration"></a>Configuration</h3>
+<div class="paragraph">
+<p>Keycloak is already installed, you can find the URL in the OpenShift console or better via terminal:</p>
+</div>
+<table class="tableblock frame-all grid-all fit-content">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.apps.cluster-guid.guid.exmaple.com" class="bare">https://keycloak-user-keycloak.apps.cluster-guid.guid.exmaple.com</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak Admin Console</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.apps.cluster-guid.guid.exmaple.com/admin" class="bare">https://keycloak-user-keycloak.apps.cluster-guid.guid.exmaple.com/admin</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Keycloak Account Console</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://keycloak-user-keycloak.apps.cluster-guid.guid.exmaple.com/realms/myrealm/account" class="bare">https://keycloak-user-keycloak.apps.cluster-guid.guid.exmaple.com/realms/myrealm/account</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internal Keycloak Service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">keycloak.user-keycloak.svc.cluster.local</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Login with admin / admin.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a realm "myrealm"</p>
+</li>
+<li>
+<p>Create a user "myuser" with first name and last name and set a password 'test' or anything you like better; set "Temporary to "Off"</p>
+</li>
+<li>
+<p>Create a client "myclient" with client type "OpenID Connect", client authentication "On", authentication flow: Standard flow, Direct access grants</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In "Access settings", set the root URL to your Keycloak URL.</p>
+</div>
+<div class="paragraph">
+<p>In tab "Advanced", set "Authentication flow overrides" to
+* Browser Flow: browser
+* Direct Grant Flow: direct grant</p>
+</div>
+<div class="paragraph">
+<p>Now call our service-a as before (<code>curl $ROUTE/service-a</code>) and then configure Service Mesh to protect the service-a:</p>
+</div>
+<div class="paragraph">
+<p>We&#8217;ve prepared an <code>auth.yml</code> file in the <code>servicemesh</code> folder. Set the correct URLs in that file and include it in the resource section of <code>servicemesh/kustomization.yml</code>. Call the service-a URL again you should get an "Unauthorized". If not, wait 1-2 seconds and try again. It always needs a short amount of time to apply ServiceMesh configuration changes to the sidecars.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_login"><a class="anchor" href="#_login"></a>Login</h3>
+<div class="paragraph">
+<p>Get the JWT from Keycloak (replace &lt;clientsecret&gt; with the secret you find in Keycloak for your client, tab "Credentials"):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-bash hljs" data-lang="bash">CLIENT_SECRET=...
+
+curl --insecure -L -X POST "https://keycloak-user-keycloak.apps.cluster-guid.guid.exmaple.com/realms/myrealm/protocol/openid-connect/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "client_id=myclient" \
+--data-urlencode "grant_type=password" \
+--data-urlencode "client_secret=$CLIENT_SECRET" \
+--data-urlencode "scope=openid" \
+--data-urlencode "username=myuser" \
+--data-urlencode "password=test"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can use <strong>jq</strong> to parse the JSON response and read only the access token:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-bash hljs" data-lang="bash">TOKEN=$(curl --insecure -L -X POST "https://keycloak-user-keycloak.apps.cluster-guid.guid.exmaple.com/realms/myrealm/protocol/openid-connect/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "client_id=myclient" \
+--data-urlencode "grant_type=password" \
+--data-urlencode "client_secret=$CLIENT_SECRET" \
+--data-urlencode "scope=openid" \
+--data-urlencode "username=myuser" \
+--data-urlencode "password=test" | jq -r '.access_token')</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then try again the service-a with the access token Bearer:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -H "Authorization: Bearer $TOKEN" $ROUTE/service-a</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now the request is routed to the backend service. Congratulations, authentication and authorization via Keycloak and Service Mesh is done!</p>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="02_gitops.html" class="query-params-link">GitOps</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../../_/js/vendor/clipboard.js"></script>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
