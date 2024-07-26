@@ -10,16 +10,17 @@ asciidoc:
     release-version: master
     page-pagination: true
 
-    console_url: "https://console-openshift-console.apps.example.com"
-    guid: "4tmkd"
-    login_command: "oc login -u user1 -p secret-password https://api.example.com:6443"
-    opentour_2022_dach_console_url: "https://console-openshift-console.apps.example.com"
-    opentour_2022_dach_login_command: "oc login -u user-1 -p secret-password https://api.example.com:6443"
-    opentour_2022_dach_password: "secret-password"
-    opentour_2022_dach_user: "user1"
-    password: "secret-password"
-    user: "user1"
-    cluster_subdomain: "apps.example.com"
+
+    console_url": "https://console-openshift-console.apps.cluster-guid.guid.exmaple.com"
+    gitea_console_url: "https://gitea.apps.cluster-guid.guid.exmaple.com"
+    gitea_password: "password"
+    gitea_user: "user"
+    guid: "guid"
+    login_command: "oc login --insecure-skip-tls-verify=false -u user -p password thttps://api.cluster-guid.guid.exmaple.com:6443"
+    openshift_cluster_ingress_domain: "apps.cluster-guid.guid.exmaple.com"
+    openshift_console_url: "https://console-openshift-console.apps.cluster-guid.guid.exmaple.com"
+    password: "password"
+    user: "user"
 
   extensions:
     - ./content/lib/tab-block.js
