@@ -1,0 +1,11 @@
+== Microservice Introduction
+
+In this lab we'll explore, how to run microservices on OpenShift Container Platform.
+
+* Step 1: Build microservices with OpenShift Pipelines
+* Step 2: Automate the deployment with OpenShift GitOps
+* Step 3: Use OpenShift Service Mesh to enhance Observability, Resiliency and Security of your microservices
+
+
+
+

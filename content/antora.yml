@@ -1,0 +1,27 @@
+name: modules
+title: Lab guide
+version: stable
+nav:
+  - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    lab_name: "I'm the lab_name var"
+    release-version: master
+    page-pagination: true
+
+
+    console_url": "https://console-openshift-console.apps.cluster-guid.guid.exmaple.com"
+    gitea_console_url: "https://gitea.apps.cluster-guid.guid.exmaple.com"
+    gitea_password: "password"
+    gitea_user: "user"
+    guid: "guid"
+    login_command: "oc login --insecure-skip-tls-verify=false -u user -p password thttps://api.cluster-guid.guid.exmaple.com:6443"
+    openshift_cluster_ingress_domain: "apps.cluster-guid.guid.exmaple.com"
+    openshift_console_url: "https://console-openshift-console.apps.cluster-guid.guid.exmaple.com"
+    password: "password"
+    user: "user"
+
+  extensions:
+    - ./content/lib/tab-block.js
+    - ./content/lib/remote-include-processor.js

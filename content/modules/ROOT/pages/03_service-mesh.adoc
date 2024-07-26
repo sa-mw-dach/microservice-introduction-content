@@ -1,0 +1,220 @@
+:GUID: {guid}
+:APPS: {openshift_cluster_ingress_domain}
+:USER: {user}
+:PASSWORD: {password}
+:openshift_console_url: {openshift_console_url}
+:user: {user}
+:password: {password}
+
+:markup-in-source: verbatim,attributes,quotes
+:source-highlighter: rouge
+
+== Service Mesh
+
+In this workshop we'll have a look at how a Service Mesh can help us to enhance the Security, Observability and Resiliency of our microservices. And all that without the need to add any libraries or to write infrastructure-related code.
+
+## The sample apps
+
+We have 3 sample apps, called Service A, B and C.
+
+* Service A: Python app which calls Service B +
+https://github.com/sa-mw-dach/microservice-introduction-app-a
+* Service B: TypeScript/Deno app which calls Service C +
+https://github.com/sa-mw-dach/microservice-introduction-app-b
+* Service C: Java app with endpoints to simulate failures +
+https://github.com/sa-mw-dach/microservice-introduction-app-c
+
+## OpenShift Service Mesh preparation
+
+In the cluster Service Mesh is already installed. You can check it in the dedicated Service Mesh namespace:
+
+[%autowidth]
+|===
+h|Select Project|`{USER}-service-mesh-system`
+|===
+
+Check the operators installed in the Admin perspective, Operators. All Service Mesh related Operators should be there and ready.
+
+## Using the Service Mesh
+
+### Add Service Mesh to our apps
+
+First, switch to the apps project:
+[source,subs="attributes"]
+```
+oc project {USER}-apps
+```
+
+Open Gitea and select the Gitops project. You'll find Gitea here:
+Git Repo URL https://gitea.{APPS}/{USER}/gitops
+
+Changes in the Git repo will be synced from ArgoCD as before.
+ArgoCD URL https://argocd-server-{USER}-gitops.{APPS}
+
+To make our apps managed by Istio Service Mesh, we have to add the corresponding annotation in our Deployment files. Add in the Deployment metadata section of the template for all deployment files:
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+annotations:
+  sidecar.istio.io/inject: "true"
+----
+
+Sync ArgoCD and the Deployments are recreated. Check the pods - all pods should be running and you should see in the READY column "2/2". Why 2? In the pod are 2 containers - one for the app and one for the Envoy Sidecar. You can also analyze the containers in the pod in the OpenShift Web Console.
+
+### Create a Gateway for Ingress
+
+Good practice is, to route all traffic to our current version, so future deployments of new versions don't get traffic by accident. For that we've provided DestinationRules and VirtualServices for all our apps. You'll find these in the `servicemesh` folder, together with a Gateway file. Gateway exposes our app-a via Istio Ingress Gateway. To apply these files, add the `servicemesh` folder to `kustomization.yml` and let ArgoCD sync.
+
+When everything is applied and the Gateway is ready, find out the Gateway URL to call our app-a endpoint:
+
+[source,bash,subs="attributes"]
+----
+ROUTE=$(oc get route istio-ingressgateway -n {USER}-service-mesh-system --template='{{ .spec.host }}')
+curl $ROUTE/service-a
+----
+
+If the services respond correctly, continue. And now it's a good opportunity, to create some traffic and to explore our Obersability tools, Kiali and Jager. Maybe create a loop to generate some traffic, and have a look at Kiali and Jaeger Distributed Tracing*. You'll find the URLs in OpenShift, Networking.
+
+[source]
+----
+while true; do curl $ROUTE/service-a; sleep 0.5; done
+----
+
+_(*) The Envoy Sidecar automatically injects tracing headers and sends traffic metadata to Kiali and Jaeger. For the Distributed Tracing, you must propagate the tracing headers when doing calls to other services. See https://istio.io/latest/docs/tasks/observability/distributed-tracing/overview/[Istio Header Propagation]._
+
+Now as we have our apps running in a Service Mesh and our Observability tools seem to be working, let's add some resiliency to our service landscape to avoid cascading failures and the propagation of errors to our end users.
+
+### Circuit Breaker and Retry
+
+Let's start by scaling our app-c to 2. You can do that in the Deployment file of app-c in Gitea.
+
+Start again our loop to call the endpoint auf app-a:
+
+[source,subs="attributes"]
+----
+ROUTE=...
+while true; do curl $ROUTE/service-a; sleep 0.5; done
+----
+
+Now let's crash app-c. There's a `/crash` endpoint, we just have to find a way to call that route. To do that, we use port-fowarding, so do a port-forward for one of the 2 app-c pods:
+
+[source,subs="attributes"]
+----
+oc get pod -n {USER}-apps
+POD_NAME=....
+oc port-forward pod/$POD_NAME -n {USER}-apps 8080:8080
+----
+
+And in a third terminal, call `localhost:8080/crash` and observe the loop - half of the calls crash and the error is propagated to our users.
+
+First step to more resiliency is a Circuit Breaker that kicks in and gives the crashed pod time to recover. The Circuit Breaker is configured in a DestinationRule. Open the file `app-c-dr-vs.yml` in the `servicemesh folder` and add the Circuit Breaker configuration to the spec section of the DestinationRule:
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+trafficPolicy:
+  connectionPool:
+    tcp:
+      maxConnections: 100
+    http:
+      http2MaxRequests: 1000
+      maxRequestsPerConnection: 10
+  outlierDetection:
+    baseEjectionTime: 10s
+    consecutive5xxErrors: 1
+    interval: 2s
+    maxEjectionPercent: 100
+----
+
+Better, but still some errors. Let's apply the retry policy. In the same file, add the Retry policy to the VirtualService for the `http` `route`:
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+retries:
+  attempts: 3
+  perTryTimeout: 1s
+  retryOn: 5xx
+----
+
+Now all errors are gone.
+
+Finally, "repair" the crashed pod by calling the repair endpoint:
+
+**Terminal 2:** +
+`curl localhost:8080/repair`
+
+After ~10 seconds the repaired pod gets traffic (Circuit Breaker goes from open to close).
+
+## Authentication and Authorization
+
+We use Keycloak to manage our users. User can login via Keycloak and we configure Service Mesh to protect our services and validate a JWT against Keycloak, so only authenticated and authorized users can call our services.
+
+### Configuration
+
+Keycloak is already installed, you can find the URL in the OpenShift console or better via terminal:
+
+
+[%autowidth]
+|===
+|Keycloak|https://keycloak-{USER}-keycloak.{APPS}
+|Keycloak Admin Console|https://keycloak-{USER}-keycloak.{APPS}/admin
+|Keycloak Account Console|https://keycloak-{USER}-keycloak.{APPS}/realms/myrealm/account
+|Internal Keycloak Service|keycloak.{USER}-keycloak.svc.cluster.local
+|===
+
+Login with admin / admin.
+
+1. Create a realm "myrealm"
+2. Create a user "myuser" with first name and last name and set a password 'test' or anything you like better; set "Temporary to "Off"
+3. Create a client "myclient" with client type "OpenID Connect", client authentication "On", authentication flow: Standard flow, Direct access grants
+
+In "Access settings", set the root URL to your Keycloak URL.
+
+In tab "Advanced", set "Authentication flow overrides" to
+* Browser Flow: browser
+* Direct Grant Flow: direct grant
+
+Now call our service-a as before (`curl $ROUTE/service-a`) and then configure Service Mesh to protect the service-a:
+
+We've prepared an `auth.yml` file in the `servicemesh` folder. Set the correct URLs in that file and include it in the resource section of `servicemesh/kustomization.yml`. Call the service-a URL again you should get an "Unauthorized". If not, wait 1-2 seconds and try again. It always needs a short amount of time to apply ServiceMesh configuration changes to the sidecars.
+
+### Login
+
+Get the JWT from Keycloak (replace <clientsecret> with the secret you find in Keycloak for your client, tab "Credentials"):
+
+
+[source,bash,options="nowrap",subs="attributes,{markup-in-source}"]
+----
+CLIENT_SECRET=...
+
+curl --insecure -L -X POST "https://keycloak-{USER}-keycloak.{APPS}/realms/myrealm/protocol/openid-connect/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "client_id=myclient" \
+--data-urlencode "grant_type=password" \
+--data-urlencode "client_secret=$CLIENT_SECRET" \
+--data-urlencode "scope=openid" \
+--data-urlencode "username=myuser" \
+--data-urlencode "password=test"
+----
+
+You can use *jq* to parse the JSON response and read only the access token:
+
+[source,bash,options="nowrap",subs="attributes,{markup-in-source}"]
+----
+TOKEN=$(curl --insecure -L -X POST "https://keycloak-{USER}-keycloak.{APPS}/realms/myrealm/protocol/openid-connect/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+--data-urlencode "client_id=myclient" \
+--data-urlencode "grant_type=password" \
+--data-urlencode "client_secret=$CLIENT_SECRET" \
+--data-urlencode "scope=openid" \
+--data-urlencode "username=myuser" \
+--data-urlencode "password=test" | jq -r '.access_token')
+----
+
+
+Then try again the service-a with the access token Bearer:
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" $ROUTE/service-a
+```
+
+Now the request is routed to the backend service. Congratulations, authentication and authorization via Keycloak and Service Mesh is done!

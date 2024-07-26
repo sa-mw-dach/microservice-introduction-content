@@ -1,0 +1,88 @@
+:GUID: {guid}
+:APPS: {openshift_cluster_ingress_domain}
+:USER: {user}
+:PASSWORD: {password}
+
+:markup-in-source: verbatim,attributes,quotes
+:source-highlighter: rouge
+
+== Simple GitOps Application Deployment
+
+=== Open OpenShift GitOps:
+
+https://argocd-server-{USER}-gitops.{APPS}
+
+[%autowidth]
+|===
+h|Username|`{USER}`
+h|Password|`{PASSWORD}`
+|===
+
+video::gitops-assets/argo-login.mp4[width=1024]
+
+=== Create GitOps Application
+
+Click on "Import YAML" in the OpenShift WebUI again and paste the ArgoCD app config:
+
+[source,yaml,options="nowrap",subs="attributes,{markup-in-source}",role=copy]
+----
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app
+  namespace: {USER}-gitops
+spec:
+  destination:
+    namespace: {USER}-apps
+    server: https://kubernetes.default.svc
+  source:
+    path: .
+    repoURL: https://gitea.{APPS}/{USER}/gitops.git
+    targetRevision: HEAD
+  project: default
+----
+
+.*Alternative: Use GUI Form*
+[%collapsible]
+====
+[%autowidth]
+|===
+
+2+h|GENERAL
+
+h|Application Name
+|`apps`
+
+h|Project Name
+|`default`
+
+h|Sync Policy|`Manual`
+
+2+h|*SOURCE*
+
+h|Repository URL|`https://gitea.{APPS}/{USER}/gitops.git`
+h|Revision|`HEAD`
+h|Path|`.`
+
+2+h|DESTINATION
+h|*Cluster URL*|`https://kubernetes.default.svc`
+h|*Namespace*|`{USER}-apps`
+|===
+
+video::gitops-assets/argo-create-app.mp4[width=1024]
+====
+
+=== Sync
+
+Now check the apps in ArgoCD and click "Synchronize" to apply everything to OpenShift.
+
+https://argocd-server-{USER}-gitops.{APPS}
+
+=== Open OpenShift Console & Application URL
+
+https://console-openshift-console.{APPS}/topology/ns/{USER}-apps?view=graph
+
+video::gitops-assets/discover-openshift-webui.mp4[width=1024]
+
+Application URL: https://https://app-a-{USER}-apps.{APPS}
+
